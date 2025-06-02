@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<!-- Add lang attribute and potentially 'dark' class -->
+<html lang="en" class=""> <!-- Start without 'dark' initially -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About the Project - NIC Project</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <script>
+        // *** Add dark mode strategy to Tailwind config ***
+        tailwind.config = {
+            darkMode: 'class', // Enable class-based dark mode
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a73e8',
+                        secondary: '#e8f0fe',
+                        // Define dark mode colors if needed, or rely on Tailwind's defaults
+                        // dark: {
+                        //     background: '#1a202c',
+                        //     text: '#e2e8f0',
+                        // }
+                    },
+                    borderRadius: {
+                        'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px',
+                        'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px',
+                        'full': '9999px', 'button': '8px'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        /* --- Font Definitions (Ensure loaded via <link> tags in base.html) --- */
+body {
+    font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    -webkit-font-smoothing: antialiased; /* Smoother fonts */
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.hindi-font {
+    font-family: 'Noto Sans Devanagari', sans-serif;
+}
+
+/* --- Custom Switch Styles (from provided HTML) --- */
+.custom-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.custom-switch-input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.custom-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc; /* Default off color */
+    transition: .4s;
+    border-radius: 34px; /* Rounded */
+}
+
+.custom-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white; /* Changed from original rgb(136, 145, 212) to white for consistency with dark mode logic in base.html */
+    transition: .4s;
+    border-radius: 50%; /* Circle */
+}
+
+.custom-switch-input:checked + .custom-switch-slider {
+    background-color: #1a73e8; /* Primary color when on */
+}
+
+.custom-switch-input:checked + .custom-switch-slider:before {
+    transform: translateX(26px); /* Move the circle */
+}
+
+/* --- Accessibility: Ensure focus is visible --- */
+/* Tailwind's default focus rings are usually good, but this is a fallback */
+*:focus-visible {
+  outline: 2px solid #1a73e8; /* Use primary color for focus */
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3); /* Optional softer focus ring */
+}
+
+/* --- Other Minimal Custom Styles (if any) --- */
+
+/* Example: Add a specific style for the example image containers if needed beyond grid/aspect ratio */
+.example-image-container {
+    /* Custom styles here */
+    /* aspect-ratio: 3 / 2; */ /* Tailwind handles aspect ratio now */
+}
+
+.example-image {
+   /* Custom image styles here */
+}
+        /* Add base dark mode styles */
+        html.dark body {
+            background-color: #1a202c; /* Example dark background */
+            color: #e2e8f0; /* Example dark text */
+        }
+        html.dark header, html.dark footer { /* Adjust header/footer */
+            background-color: #2d3748;
+            color: #e2e8f0;
+        }
+         html.dark .card { /* Adjust card styles */
+             background-color: #2d3748;
+             border-color: #4a5568;
+         }
+         html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6, html.dark p, html.dark span, html.dark li, html.dark label, html.dark small {
+             /* Adjust general text elements */
+             color: #e2e8f0; /* Light text */
+         }
+          html.dark .text-gray-600, html.dark .text-gray-700, html.dark .text-gray-800, html.dark .text-gray-900 {
+             color: #a0aec0; /* Lighter gray for dark mode */
+         }
+         html.dark .text-muted {
+            color: #718096;
+         }
+         html.dark .bg-white { background-color: #2d3748 !important; }
+         html.dark .bg-gray-50 { background-color: #1a202c !important; }
+         html.dark .bg-gray-100 { background-color: #2d3748 !important; }
+         html.dark .border-gray-100, html.dark .border-gray-200 { border-color: #4a5568 !important; }
+         html.dark .hover\:bg-gray-50:hover { background-color: #4a5568 !important; }
+         html.dark .navbar-dark .navbar-brand, html.dark .navbar-dark .nav-link { color: #fff; }
+         html.dark .navbar-dark .nav-link.active { color: #fff; font-weight: bold; }
+
+
+    </style>
+    
+</head>
+<!-- Add dark mode background/text for body base -->
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col text-gray-900 dark:text-gray-200">
+
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="index.html" class="text-2xl font-['Pacifico'] text-primary dark:text-blue-400 mr-8" data-lang-en="Recognition and Prediction" data-lang-hi="पहचान और पूर्वानुमान">Recognition and Prediction</a>
+                <!-- *** START: Updated Navigation Bar *** -->
+                <nav id="mainNav" class="hidden md:flex space-x-6">
+                     <a href="index.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Home" data-lang-hi="होम">Home</a>
+                     <!-- Assuming recognizer.html is the main tool page, link from index.html might be better -->
+                     <a href="recognizer.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Recognize" data-lang-hi="पहचानें">Recognize</a>
+                     <!-- Assuming examples.html exists -->
+                     <a href="examples.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Examples" data-lang-hi="उदाहरण">Examples</a>
+                     <!-- Assuming technology.html exists -->
+                     <a href="technology.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Technology" data-lang-hi="तकनीक">Technology</a>
+                     <!-- Assuming about.html exists -->
+                    <a href="about.html" class="nav-link text-primary dark:text-blue-400 font-medium" data-lang-en="About" data-lang-hi="बारे में">About</a>
+                    <!-- Link to contact.html -->
+                    <a href="contact.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Contact" data-lang-hi="संपर्क">Contact</a>
+                    <!-- Active link for this page -->
+                    <a href="feedback.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Feedback" data-lang-hi="प्रतिक्रिया">Feedback</a>
+                </nav>
+                </nav>
+            </div>
+            <!-- Right side header items -->
+            <div class="flex items-center space-x-4">
+                <!-- Language Switch -->
+                <div class="items-center space-x-2 hidden md:flex">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">EN</span>
+                    <label class="custom-switch">
+                        <!-- *** Add ID: languageToggle *** -->
+                        <input type="checkbox" id="languageToggle" class="custom-switch-input">
+                        <span class="custom-switch-slider"></span>
+                    </label>
+                    <span class="text-sm text-gray-600 dark:text-gray-400 hindi-font">हिंदी</span>
+                </div>
+                 <!-- Theme Switch -->
+                 <div class="items-center space-x-2 hidden md:flex">
+                    <span class="text-sm text-gray-600 dark:text-gray-400"><i class="ri-sun-line"></i></span>
+                    <label class="custom-switch">
+                         <!-- *** Add ID: themeToggle *** -->
+                        <input type="checkbox" id="themeToggle" class="custom-switch-input">
+                        <span class="custom-switch-slider"></span>
+                    </label>
+                    <span class="text-sm text-gray-600 dark:text-gray-400"><i class="ri-moon-line"></i></span>
+                </div>
+                <!-- User/Notification Icons (Keep as placeholders) 
+                <div class="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full cursor-pointer" title="User Profile (Placeholder)">
+                    <i class="ri-user-line text-gray-600 dark:text-gray-300"></i>
+                </div>
+                <div class="w-10 h-10 flex items-center justify-center relative cursor-pointer" title="Notifications (Placeholder)">
+                    <i class="ri-notification-3-line text-gray-600 dark:text-gray-300"></i>
+                    <span class="absolute top-0 right-0 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">3</span>
+                </div>-->
+                 <!-- Mobile Menu Button (Placeholder) -->
+                <button class="md:hidden w-10 h-10 flex items-center justify-center" aria-label="Toggle Menu">
+                     <i class="ri-menu-line text-gray-600 dark:text-gray-300 text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+   <!-- Main Content Area -->
+<main class="flex-grow">
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-3xl mx-auto">
+            <!-- Apply dark mode classes to the card -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <!-- Apply dark mode classes to the header -->
+                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
+                        <i class="ri-information-line mr-2 text-primary text-2xl"></i>
+                        <!-- Add attributes to the title span -->
+                        <span data-lang-en="About This Project" data-lang-hi="इस परियोजना के बारे में">About This Project</span>
+                    </h2>
+                </div>
+                <!-- Apply dark mode classes to text elements in the body -->
+                <div class="p-6 md:p-8 space-y-6 text-gray-700 dark:text-gray-300 leading-relaxed">
+                    <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3" data-lang-en="Hindi Handwritten Text Recognition, Translation, and Gender Prediction" data-lang-hi="हिंदी हस्तलिखित पाठ पहचान, अनुवाद, और लिंग भविष्यवाणी">Hindi Handwritten Text Recognition, Translation, and Gender Prediction</h3>
+                    <p data-lang-en="This project presents a comprehensive system for processing handwritten Hindi text.  It leverages advanced deep learning models for recognizing handwritten Hindi characters and words. Beyond recognition, the system includes translation capabilities and gender prediction, offering a versatile tool for various applications." data-lang-hi="यह परियोजना हस्तलिखित हिंदी पाठ को संसाधित करने के लिए एक व्यापक प्रणाली प्रस्तुत करती है। यह हस्तलिखित हिंदी अक्षरों और शब्दों को पहचानने के लिए उन्नत डीप लर्निंग मॉडल का उपयोग करता है। पहचान के अलावा, सिस्टम में अनुवाद क्षमताएं और लिंग भविष्यवाणी शामिल है, जो विभिन्न अनुप्रयोगों के लिए एक बहुमुखी उपकरण प्रदान करता है।">
+                        This project presents a comprehensive system for processing handwritten Hindi text. It leverages advanced deep learning models for recognizing handwritten Hindi characters and words. Beyond recognition, the system includes translation capabilities and gender prediction, offering a versatile tool for various applications.
+                    </p>
+                    <hr class="my-6 border-gray-200 dark:border-gray-600">
+
+                    <h4 class="text-xl font-semibold text-gray-800 dark:text-white" data-lang-en="Motivation" data-lang-hi="प्रेरणा">Motivation</h4>
+                    <p data-lang-en="The manual processing of handwritten Hindi documents poses significant challenges due to the diversity in handwriting styles and the complexities of the Devanagari script. This project is motivated by the need for automated solutions to digitize and analyze handwritten Hindi text, improve accessibility to historical and cultural records, and facilitate language understanding.  The inclusion of translation and gender prediction expands the utility of this system for a wider range of applications." data-lang-hi="हस्तलिखित हिंदी दस्तावेजों का मैन्युअल प्रसंस्करण लिखावट शैलियों की विविधता और देवनागरी लिपि की जटिलताओं के कारण महत्वपूर्ण चुनौतियां प्रस्तुत करता है। यह परियोजना हस्तलिखित हिंदी पाठ को डिजिटाइज़ करने और उसका विश्लेषण करने, ऐतिहासिक और सांस्कृतिक अभिलेखों तक पहुंच में सुधार करने और भाषा की समझ को सुविधाजनक बनाने के लिए स्वचालित समाधान की आवश्यकता से प्रेरित है। अनुवाद और लिंग भविष्यवाणी को शामिल करने से विभिन्न अनुप्रयोगों के लिए इस प्रणाली की उपयोगिता का विस्तार होता है।">
+                        The manual processing of handwritten Hindi documents poses significant challenges due to the diversity in handwriting styles and the complexities of the Devanagari script. This project is motivated by the need for automated solutions to digitize and analyze handwritten Hindi text, improve accessibility to historical and cultural records, and facilitate language understanding. The inclusion of translation and gender prediction expands the utility of this system for a wider range of applications.
+                    </p>
+
+                    <h4 class="text-xl font-semibold text-gray-800 dark:text-white mt-4" data-lang-en="Key Features" data-lang-hi="मुख्य विशेषताएं">Key Features</h4>
+                    <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+                        <li data-lang-en="Handwritten Hindi Text Recognition: Utilizes deep learning models to accurately recognize Hindi characters and words from handwritten text images." data-lang-hi="हस्तलिखित हिंदी पाठ पहचान: हस्तलिखित पाठ छवियों से हिंदी अक्षरों और शब्दों को सटीक रूप से पहचानने के लिए डीप लर्निंग मॉडल का उपयोग करता है।">Handwritten Hindi Text Recognition: Utilizes deep learning models to accurately recognize Hindi characters and words from handwritten text images.</li>
+                        <li data-lang-en="Hindi to English Translation: Provides real-time translation of recognized Hindi text into English, enabling a deeper understanding for a global audience." data-lang-hi="हिंदी से अंग्रेजी अनुवाद: मान्यता प्राप्त हिंदी पाठ का अंग्रेजी में वास्तविक समय में अनुवाद प्रदान करता है, जो वैश्विक दर्शकों के लिए गहरी समझ को सक्षम बनाता है।">Hindi to English Translation: Provides real-time translation of recognized Hindi text into English, enabling a deeper understanding for a global audience.</li>
+                        <li data-lang-en="Gender Prediction: Attempts to predict the likely gender of the author based on the writing style and the recognized text, offering an additional analytical layer." data-lang-hi="लिंग भविष्यवाणी: लेखन शैली और मान्यता प्राप्त पाठ के आधार पर लेखक के संभावित लिंग की भविष्यवाणी करने का प्रयास करता है, जिससे एक अतिरिक्त विश्लेषणात्मक परत मिलती है।">Gender Prediction: Attempts to predict the likely gender of the author based on the writing style and the recognized text, offering an additional analytical layer.</li>
+                        <li data-lang-en="User-Friendly Interface: Offers an intuitive web-based interface for easy image uploads, results visualization, and interaction with the system." data-lang-hi="उपयोगकर्ता के अनुकूल इंटरफेस: आसान छवि अपलोड, परिणामों की कल्पना और सिस्टम के साथ बातचीत के लिए एक सहज वेब-आधारित इंटरफ़ेस प्रदान करता है।">User-Friendly Interface: Offers an intuitive web-based interface for easy image uploads, results visualization, and interaction with the system.</li>
+                    </ul>
+
+                     <h4 class="text-xl font-semibold text-gray-800 dark:text-white mt-4" data-lang-en="Technology Stack" data-lang-hi="प्रौद्योगिकी स्टैक">Technology Stack</h4>
+                     <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+                         <li data-lang-en="Deep Learning Framework: TensorFlow/PyTorch (or specify)." data-lang-hi="डीप लर्निंग फ्रेमवर्क: TensorFlow/PyTorch (या निर्दिष्ट करें)।">Deep Learning Framework: TensorFlow/PyTorch (or specify).</li>
+                         <li data-lang-en="Programming Language: Python." data-lang-hi="प्रोग्रामिंग भाषा: पायथन।">Programming Language: Python.</li>
+                         <li data-lang-en="Frontend: HTML, CSS, JavaScript (and any framework like React, Vue, etc.)." data-lang-hi="फ्रंटएंड: HTML, CSS, जावास्क्रिप्ट (और React, Vue, आदि जैसे कोई भी फ्रेमवर्क)।">Frontend: HTML, CSS, JavaScript (and any framework like React, Vue, etc.).</li>
+                         <li data-lang-en="Backend: Flask/Django (or specify)." data-lang-hi="बैकएंड: फ्लास्क/जैंगो (या निर्दिष्ट करें)।">Backend: Flask/Django (or specify).</li>
+                         <li data-lang-en="Translation API: Google Translate API/Other (specify)." data-lang-hi="अनुवाद एपीआई: गूगल ट्रांसलेट एपीआई/अन्य (निर्दिष्ट करें)।">Translation API: Google Translate API/Other (specify).</li>
+                     </ul>
+
+                    <h4 class="text-xl font-semibold text-gray-800 dark:text-white mt-4" data-lang-en="Potential Applications" data-lang-hi="संभावित अनुप्रयोग">Potential Applications</h4>
+                    <p data-lang-en="This project has applications in a wide range of areas, including:" data-lang-hi="इस परियोजना के अनुप्रयोगों की एक विस्तृत श्रृंखला है, जिसमें शामिल हैं:">
+                        This project has applications in a wide range of areas, including:
+                    </p>
+                    <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+                        <li data-lang-en="Digitization of Historical Documents: Converting handwritten manuscripts and records into searchable digital formats." data-lang-hi="ऐतिहासिक दस्तावेजों का डिजिटलीकरण: हस्तलिखित पांडुलिपियों और अभिलेखों को खोज योग्य डिजिटल प्रारूपों में परिवर्तित करना।">Digitization of Historical Documents: Converting handwritten manuscripts and records into searchable digital formats.</li>
+                        <li data-lang-en="Educational Resources: Creating interactive learning materials by automatically transcribing and translating handwritten notes and exercises." data-lang-hi="शैक्षिक संसाधन: हस्तलिखित नोट्स और अभ्यास को स्वचालित रूप से ट्रांसक्रिप्टिंग और अनुवाद करके इंटरैक्टिव शिक्षण सामग्री बनाना।">Educational Resources: Creating interactive learning materials by automatically transcribing and translating handwritten notes and exercises.</li>
+                        <li data-lang-en="Language Learning Tools: Assisting language learners in understanding and practicing Hindi through recognition, translation, and gender analysis." data-lang-hi="भाषा सीखने के उपकरण: मान्यता, अनुवाद और लिंग विश्लेषण के माध्यम से हिंदी को समझने और अभ्यास करने में भाषा सीखने वालों की सहायता करना।">Language Learning Tools: Assisting language learners in understanding and practicing Hindi through recognition, translation, and gender analysis.</li>
+                        <li data-lang-en="Research and Analysis: Providing tools for researchers in linguistics, history, and cultural studies to analyze handwritten text and identify patterns." data-lang-hi="अनुसंधान और विश्लेषण: भाषा विज्ञान, इतिहास और सांस्कृतिक अध्ययन के शोधकर्ताओं को हस्तलिखित पाठ का विश्लेषण करने और पैटर्न की पहचान करने के लिए उपकरण प्रदान करना।">Research and Analysis: Providing tools for researchers in linguistics, history, and cultural studies to analyze handwritten text and identify patterns.</li>
+                    </ul>
+
+
+                    <!-- Option 2: Switchable Name -->
+                    <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400" data-lang-en="D.Sakshi" data-lang-hi="डी. साक्षी">
+                        D.Sakshi
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12"> <!-- Adjusted footer text color -->
+        <div class="container mx-auto px-4">
+             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                 <div>
+                     <!-- Add data-lang attributes to footer elements if needed -->
+                    <a href="/" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block" data-lang-en="Recognition and Prediction" data-lang-hi="पहचान और पूर्वानुमान">Recognition and Prediction</a>
+                    <p class="mb-4 text-sm" data-lang-en="A system for recognizing Hindi handwritten text, predicting gender from content, and translating it into other languages." data-lang-hi="हिंदी हस्तलिखित पाठ की पहचान, सामग्री के आधार पर लिंग पूर्वानुमान और अनुवाद करने वाली एक प्रणाली।">A system for recognizing Hindi handwritten text, predicting gender from content, and translating it into other languages.</p>
+                    <div class="flex space-x-4">
+                        <!-- <a href="#" class="hover:text-white" title="GitHub (Placeholder)"><i class="ri-github-fill"></i></a>-->
+                        <!-- <a href="#" class="hover:text-white" title="LinkedIn (Placeholder)"><i class="ri-linkedin-box-fill"></i></a>-->
+                    </div>
+                </div>
+                 <div>
+                    <h3 class="text-lg font-medium text-white mb-4" data-lang-en="Quick Links" data-lang-hi="त्वरित लिंक्स">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/" class="hover:text-white" data-lang-en="Home" data-lang-hi="होम">Home</a></li>
+                        <li><a href="/recognize" class="hover:text-white" data-lang-en="Recognize" data-lang-hi="पहचानें">Recognize</a></li>
+                        <li><a href="/examples" class="hover:text-white" data-lang-en="Examples" data-lang-hi="उदाहरण">Examples</a></li>
+                         <li><a href="/technology" class="hover:text-white" data-lang-en="Technology" data-lang-hi="तकनीक">Technology</a></li>
+                        <li><a href="/about" class="hover:text-white" data-lang-en="About" data-lang-hi="बारे में">About</a></li>
+                        <li><a href="/contact" class="hover:text-white" data-lang-en="Contact Us" data-lang-hi="संपर्क">Contact Us</a></li>
+                        <li><a href="/feedback" class="hover:text-white" data-lang-en="Feedback" data-lang-hi="प्रतिक्रिया">Feedback</a></li>
+
+
+                    </ul>
+                </div>
+                 <!--<div>
+                    <h3 class="text-lg font-medium text-white mb-4" data-lang-en="Resources" data-lang-hi="संसाधन">Resources</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white" data-lang-en="Documentation (TBD)" data-lang-hi="प्रलेखन (TBD)">Documentation (TBD)</a></li>
+                        <li><a href="#" class="hover:text-white" data-lang-en="GitHub Repo (Link)" data-lang-hi="गिटहब रेपो (लिंक)">GitHub Repo (Link)</a></li>
+                        <li><a href="#" class="hover:text-white" data-lang-en="Support (TBD)" data-lang-hi="समर्थन (TBD)">Support (TBD)</a></li>
+                    </ul>
+                </div>-->
+                 <div>
+                    <h3 class="text-lg font-medium text-white mb-4" data-lang-en="Contact (Project)" data-lang-hi="संपर्क (परियोजना)">Contact (Project)</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start">
+                            <i class="ri-mail-line mt-1 mr-2"></i>
+                            <span>sdevilgv@gmail.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="ri-building-line mr-2"></i>
+                            <span>NIC Durg</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Copyright -->
+             <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-sm">© 2025 D. Sakshi | Final Year Project | NIC Durg</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Bootstrap JS Bundle (Not needed for Tailwind, can remove if not used elsewhere) -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> -->
+
+    <!-- Base Theme/Language Script -->
+    <script>
+        // --- Theme Toggle ---
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement; // Target <html> tag
+
+        // Function to apply theme based on preference
+        function applyTheme(isDark) {
+            if (isDark) {
+                htmlElement.classList.add('dark');
+                if(themeToggle) themeToggle.checked = true;
+                console.log("Theme applied: dark");
+            } else {
+                htmlElement.classList.remove('dark');
+                 if(themeToggle) themeToggle.checked = false;
+                 console.log("Theme applied: light");
+            }
+        }
+
+        // Check localStorage on load
+        const prefersDark = localStorage.getItem('theme') === 'dark' ||
+                           (localStorage.getItem('theme') === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        applyTheme(prefersDark);
+
+        // Add listener to toggle button
+        if(themeToggle){
+            themeToggle.addEventListener('change', (event) => {
+                const isDark = event.target.checked;
+                applyTheme(isDark);
+                // Save preference to localStorage
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            });
+        } else {
+             console.warn("Theme toggle button not found.");
+        }
+
+        // --- Language Toggle (Simple Version) ---
+        const languageToggle = document.getElementById('languageToggle');
+        const langElements = document.querySelectorAll('[data-lang-en]'); // Select elements with language data
+
+        // Function to apply language
+        function applyLanguage(lang) { // lang should be 'en' or 'hi'
+             console.log("Applying language:", lang);
+             htmlElement.setAttribute('lang', lang); // Set overall page lang
+
+             langElements.forEach(el => {
+                const text = el.getAttribute(`data-lang-${lang}`);
+                if (text) {
+                    el.textContent = text; // Replace text content
+                }
+             });
+
+             // Update toggle state
+             if (languageToggle) languageToggle.checked = (lang === 'hi');
+
+             // Save preference
+             localStorage.setItem('language', lang);
+        }
+
+         // Check localStorage on load for language
+         const savedLang = localStorage.getItem('language') || 'en'; // Default to English
+         applyLanguage(savedLang);
+
+         // Add listener to language toggle button
+         if (languageToggle) {
+             languageToggle.addEventListener('change', (event) => {
+                const newLang = event.target.checked ? 'hi' : 'en';
+                applyLanguage(newLang);
+             });
+         } else {
+             console.warn("Language toggle button not found.");
+         }
+
+    </script>
+
+    <!-- Block for page-specific scripts -->
+    
+</body>
+</html>

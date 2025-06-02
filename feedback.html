@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" class=""> <!-- Start without 'dark' initially -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - AI Text Tools</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <script>
+        // Tailwind config
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { primary: '#1a73e8', secondary: '#e8f0fe' },
+                    borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' }
+                }
+            }
+        }
+    </script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .hindi-font { font-family: 'Noto Sans Devanagari', sans-serif; }
+        .custom-switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .custom-switch-input { opacity: 0; width: 0; height: 0; }
+        .custom-switch-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .custom-switch-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        .custom-switch-input:checked + .custom-switch-slider { background-color: #1a73e8; }
+        .custom-switch-input:checked + .custom-switch-slider:before { transform: translateX(26px); }
+        *:focus-visible { outline: 2px solid #1a73e8; outline-offset: 2px; box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3); }
+        /* Base Dark Mode */
+        html.dark body { background-color: #1a202c; color: #e2e8f0; }
+        html.dark header, html.dark footer { background-color: #2d3748; color: #e2e8f0; }
+        html.dark .card { background-color: #2d3748; border-color: #4a5568; } /* Simplified card selector */
+        html.dark h1, html.dark h2, html.dark h3, html.dark p, html.dark span, html.dark li, html.dark label, html.dark small, html.dark strong, html.dark button:not(.bg-red-500):not(.bg-green-600), html.dark a { color: #e2e8f0; }
+        html.dark a.text-primary { color: #60a5fa; }
+        html.dark .text-gray-600, html.dark .text-gray-700, html.dark .text-gray-800, html.dark .text-gray-900 { color: #a0aec0; }
+        html.dark .text-gray-500, html.dark .text-gray-400 { color: #718096; }
+        html.dark .bg-white { background-color: #2d3748 !important; }
+        html.dark .bg-gray-50 { background-color: #1a202c !important; }
+        html.dark .bg-gray-100 { background-color: #374151 !important; }
+        html.dark .border-gray-100, html.dark .border-gray-200 { border-color: #4a5568 !important; }
+        /* Dark mode Forms */
+        html.dark input, html.dark textarea { background-color: #1f2937; border-color: #4b5563; color: #e5e7eb; }
+        html.dark input::placeholder, html.dark textarea::placeholder { color: #6b7280; }
+        html.dark .error-message { background-color: #450a0a; color: #fecaca; border-color: #7f1d1d; }
+        html.dark .success-message { background-color: #064e3b; color: #a7f3d0; border-color: #047857;}
+        html.dark .spinner { border-color: rgba(255, 255, 255, 0.1); border-left-color: #60a5fa; }
+        /* General Loading Spinner */
+        .spinner { border: 3px solid rgba(255, 255, 255, 0.3); width: 16px; height: 16px; border-radius: 50%; border-left-color: #fff; animation: spin 1s ease infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Form Message Styling */
+        .form-message { padding: 0.75rem 1rem; border-radius: 8px; margin-top: 1rem; font-weight: 500; border: 1px solid; font-size: 0.9rem; display: none; }
+        .error-message { color: #dc2626; background-color: #fee2e2; border-color: #fecaca; }
+        .success-message { color: #059669; background-color: #d1fae5; border-color: #a7f3d0; }
+        /* Input Field Style */
+        .input-field {
+             display: block;
+             width: 100%;
+             padding: 0.5rem 0.75rem;
+             border: 1px solid #d1d5db;
+             border-radius: 8px;
+             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+             transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+             font-size: 0.875rem;
+         }
+         html.dark .input-field {
+             background-color: #374151;
+             border-color: #4b5563;
+             color: #e5e7eb;
+         }
+         .input-field:focus {
+             outline: none;
+             border-color: #1a73e8;
+             box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3);
+         }
+         html.dark .input-field:focus {
+             border-color: #60a5fa;
+             box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+         }
+         /* Ensure nav link styling is consistent */
+         .nav-link { transition: color 0.2s ease-in-out; }
+
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col text-gray-900 dark:text-gray-200">
+
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="index.html" class="text-2xl font-['Pacifico'] text-primary dark:text-blue-400 mr-8" data-lang-en="Recognition and Prediction" data-lang-hi="पहचान और पूर्वानुमान">Recognition and Prediction</a>
+                <!-- *** START: Updated Navigation Bar *** -->
+                <nav id="mainNav" class="hidden md:flex space-x-6">
+                     <a href="index.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Home" data-lang-hi="होम">Home</a>
+                     <!-- Assuming recognizer.html is the main tool page, link from index.html might be better -->
+                     <a href="recognizer.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Recognize" data-lang-hi="पहचानें">Recognize</a>
+                     <!-- Assuming examples.html exists -->
+                     <a href="examples.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Examples" data-lang-hi="उदाहरण">Examples</a>
+                     <!-- Assuming technology.html exists -->
+                     <a href="technology.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Technology" data-lang-hi="तकनीक">Technology</a>
+                     <!-- Assuming about.html exists -->
+                    <a href="about.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="About" data-lang-hi="बारे में">About</a>
+                    <!-- Link to contact.html -->
+                    <a href="contact.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Contact" data-lang-hi="संपर्क">Contact</a>
+                    <!-- Active link for this page -->
+                    <a href="feedback.html" class="nav-link text-primary dark:text-blue-400 font-medium" data-lang-en="Feedback" data-lang-hi="प्रतिक्रिया">Feedback</a>
+                </nav>
+                <!-- *** END: Updated Navigation Bar *** -->
+            </div>
+            <!-- Right side header items (Theme, Lang Toggles) -->
+            <div class="flex items-center space-x-4">
+                <div class="items-center space-x-2 hidden md:flex"> <span class="text-sm text-gray-600 dark:text-gray-400">EN</span> <label class="custom-switch"><input type="checkbox" id="languageToggle" class="custom-switch-input"><span class="custom-switch-slider"></span></label> <span class="text-sm text-gray-600 dark:text-gray-400 hindi-font">हिंदी</span> </div>
+                <div class="items-center space-x-2 hidden md:flex"> <span class="text-sm text-gray-600 dark:text-gray-400"><i class="ri-sun-line"></i></span> <label class="custom-switch"><input type="checkbox" id="themeToggle" class="custom-switch-input"><span class="custom-switch-slider"></span></label> <span class="text-sm text-gray-600 dark:text-gray-400"><i class="ri-moon-line"></i></span> </div>
+                <!-- Removed Logout Button and User Icons for feedback page -->
+                <button class="md:hidden w-10 h-10 flex items-center justify-center" aria-label="Toggle Menu"><i class="ri-menu-line text-gray-600 dark:text-gray-300 text-xl"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== Main Content Area ===== -->
+    <main class="flex-grow container mx-auto px-4 py-12">
+
+        <h1 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-4" data-lang-en="Provide Feedback" data-lang-hi="प्रतिक्रिया दें">Provide Feedback</h1>
+        <p class="text-center text-gray-600 dark:text-gray-400 mb-10" data-lang-en="Help us improve the AI Text Tools by sharing your thoughts." data-lang-hi="अपने विचार साझा करके एआई टेक्स्ट उपकरण को बेहतर बनाने में हमारी सहायता करें।">
+            Help us improve the AI Text Tools by sharing your thoughts.
+        </p>
+
+        <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 card">
+            <form id="feedbackForm" novalidate>
+                <div class="mb-6">
+                    <label for="feedbackText" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" data-lang-en="Your Feedback" data-lang-hi="आपकी प्रतिक्रिया">Your Feedback</label>
+                    <textarea id="feedbackText" name="feedback" rows="6" required class="input-field" placeholder="Enter your feedback here..." data-lang-en-placeholder="Enter your feedback here..." data-lang-hi-placeholder="अपनी प्रतिक्रिया यहाँ दर्ज करें..."></textarea>
+                </div>
+
+                <div id="formMessage" class="form-message mb-6"></div> <!-- For Success/Error Messages -->
+
+                <button type="submit" id="submitFeedbackButton" class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-button shadow-sm text-sm font-medium text-white bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-gray-800 disabled:opacity-50">
+                    <span data-lang-en="Submit Feedback" data-lang-hi="प्रतिक्रिया जमा करें">Submit Feedback</span>
+                    <i class="ri-send-plane-fill text-base"></i>
+                    <div class="spinner hidden ml-2"></div> <!-- Loading Spinner -->
+                </button>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12"> <!-- Adjusted footer text color -->
+        <div class="container mx-auto px-4">
+             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                 <div>
+                     <!-- Add data-lang attributes to footer elements if needed -->
+                    <a href="/" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block" data-lang-en="Recognition and Prediction" data-lang-hi="पहचान और पूर्वानुमान">Recognition and Prediction</a>
+                    <p class="mb-4 text-sm" data-lang-en="A system for recognizing Hindi handwritten text, predicting gender from content, and translating it into other languages." data-lang-hi="हिंदी हस्तलिखित पाठ की पहचान, सामग्री के आधार पर लिंग पूर्वानुमान और अनुवाद करने वाली एक प्रणाली।">A system for recognizing Hindi handwritten text, predicting gender from content, and translating it into other languages.</p>
+                    <div class="flex space-x-4">
+                        <!-- <a href="#" class="hover:text-white" title="GitHub (Placeholder)"><i class="ri-github-fill"></i></a>-->
+                        <!-- <a href="#" class="hover:text-white" title="LinkedIn (Placeholder)"><i class="ri-linkedin-box-fill"></i></a>-->
+                    </div>
+                </div>
+                 <div>
+                    <h3 class="text-lg font-medium text-white mb-4" data-lang-en="Quick Links" data-lang-hi="त्वरित लिंक्स">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/" class="hover:text-white" data-lang-en="Home" data-lang-hi="होम">Home</a></li>
+                        <li><a href="/recognize" class="hover:text-white" data-lang-en="Recognize" data-lang-hi="पहचानें">Recognize</a></li>
+                        <li><a href="/examples" class="hover:text-white" data-lang-en="Examples" data-lang-hi="उदाहरण">Examples</a></li>
+                         <li><a href="/technology" class="hover:text-white" data-lang-en="Technology" data-lang-hi="तकनीक">Technology</a></li>
+                        <li><a href="/about" class="hover:text-white" data-lang-en="About" data-lang-hi="बारे में">About</a></li>
+                        <li><a href="/contact" class="hover:text-white" data-lang-en="Contact Us" data-lang-hi="संपर्क">Contact Us</a></li>
+                        <li><a href="/feedback" class="hover:text-white" data-lang-en="Feedback" data-lang-hi="प्रतिक्रिया">Feedback</a></li>
+
+
+                    </ul>
+                </div>
+                 <!--<div>
+                    <h3 class="text-lg font-medium text-white mb-4" data-lang-en="Resources" data-lang-hi="संसाधन">Resources</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white" data-lang-en="Documentation (TBD)" data-lang-hi="प्रलेखन (TBD)">Documentation (TBD)</a></li>
+                        <li><a href="#" class="hover:text-white" data-lang-en="GitHub Repo (Link)" data-lang-hi="गिटहब रेपो (लिंक)">GitHub Repo (Link)</a></li>
+                        <li><a href="#" class="hover:text-white" data-lang-en="Support (TBD)" data-lang-hi="समर्थन (TBD)">Support (TBD)</a></li>
+                    </ul>
+                </div>-->
+                 <div>
+                    <h3 class="text-lg font-medium text-white mb-4" data-lang-en="Contact (Project)" data-lang-hi="संपर्क (परियोजना)">Contact (Project)</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start">
+                            <i class="ri-mail-line mt-1 mr-2"></i>
+                            <span>sdevilgv@gmail.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="ri-building-line mr-2"></i>
+                            <span>NIC Durg</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Copyright -->
+             <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-sm">© 2025 D. Sakshi | Final Year Project | NIC Durg</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Base Theme/Language Script -->
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        function applyTheme(isDark) { if (isDark) { htmlElement.classList.add('dark'); if(themeToggle) themeToggle.checked = true; } else { htmlElement.classList.remove('dark'); if(themeToggle) themeToggle.checked = false; } }
+        const languageToggle = document.getElementById('languageToggle');
+        const langElements = document.querySelectorAll('[data-lang-en]');
+        const placeholderElements = document.querySelectorAll('[data-lang-en-placeholder]'); // Select elements with placeholder translations
+
+        function applyLanguage(lang) {
+            htmlElement.setAttribute('lang', lang);
+            // Handle regular text elements
+            langElements.forEach(el => {
+                const text = el.getAttribute(`data-lang-${lang}`);
+                if (text) {
+                    const icon = el.querySelector('i');
+                    if (icon && el.childNodes.length > 1) { // Element has icon and text node
+                        let updated = false;
+                        el.childNodes.forEach(node => {
+                            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
+                                node.textContent = ` ${text} `; // Add spaces around text if next to icon
+                                updated = true;
+                            }
+                        });
+                        // Fallback if text node wasn't found/updated directly
+                        if (!updated) {
+                           const currentText = el.getAttribute(`data-lang-${lang === 'en' ? 'hi' : 'en'}`);
+                           if (currentText) el.innerHTML = el.innerHTML.replace(currentText.trim(), text);
+                        }
+                    } else { // Element is likely just text
+                         el.textContent = text;
+                    }
+                 }
+             });
+             // Handle placeholder attributes
+            placeholderElements.forEach(el => {
+                const placeholderText = el.getAttribute(`data-lang-${lang}-placeholder`);
+                 if (placeholderText !== null) { // Check if attribute exists
+                     el.placeholder = placeholderText;
+                 }
+             });
+
+             if (languageToggle) languageToggle.checked = (lang === 'hi');
+             localStorage.setItem('language', lang);
+         }
+
+         // Function to initialize theme/language from storage or system preference
+         function initializeSettings() {
+             const savedLang = localStorage.getItem('language') || 'en';
+             const prefersDark = localStorage.getItem('theme') === 'dark' || (localStorage.getItem('theme') === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+             applyTheme(prefersDark);
+             applyLanguage(savedLang); // Apply language after DOM is ready potentially
+
+             if (languageToggle) {
+                 languageToggle.addEventListener('change', (event) => {
+                     const newLang = event.target.checked ? 'hi' : 'en';
+                     applyLanguage(newLang);
+                 });
+             } else {
+                 console.warn("Language toggle button not found.");
+             }
+
+             if (themeToggle) {
+                 themeToggle.addEventListener('change', (event) => {
+                     const isDark = event.target.checked;
+                     applyTheme(isDark);
+                     localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                 });
+             } else {
+                 console.warn("Theme toggle button not found.");
+             }
+         }
+    </script>
+
+    <!-- Feedback Form Submission Script (Corrected API Endpoint) -->
+    <script>
+        // *** CORRECTED: Define the FULL API endpoint URL from app.py context ***
+        // MAKE SURE this URL points to where your app.py (OCR API) is running
+        const OCR_API_BASE_URL = 'https://sameernotes-ocr.hf.space'; // Or 'http://localhost:8000' if running locally
+        const FEEDBACK_API_ENDPOINT = `${OCR_API_BASE_URL}/feedback/`;
+
+        // Get DOM elements (ensure these are correct IDs)
+        const feedbackForm = document.getElementById('feedbackForm');
+        const submitButton = document.getElementById('submitFeedbackButton');
+        const feedbackTextInput = document.getElementById('feedbackText');
+        const formMessageDiv = document.getElementById('formMessage');
+        const spinner = submitButton ? submitButton.querySelector('.spinner') : null;
+        // Language toggle reference is needed from the base script above, assumed available
+
+        // Function to display messages
+        function showFormMessage(message, isSuccess = true) {
+            if (!formMessageDiv) return;
+            formMessageDiv.textContent = message;
+            formMessageDiv.className = 'form-message mb-6'; // Reset classes, keep margin
+            if (isSuccess) {
+                formMessageDiv.classList.add('success-message');
+            } else {
+                formMessageDiv.classList.add('error-message');
+            }
+            formMessageDiv.style.display = 'block';
+            setTimeout(() => hideFormMessage(), 5000); // Hide after 5 seconds
+        }
+
+        function hideFormMessage() {
+             if (formMessageDiv) {
+                 formMessageDiv.style.display = 'none';
+                 formMessageDiv.textContent = '';
+             }
+        }
+
+        // Function to handle loading state
+        function setFormLoading(isLoading) {
+            if (!submitButton || !spinner) return;
+            submitButton.disabled = isLoading;
+            spinner.classList.toggle('hidden', !isLoading);
+            // Adjust opacity of button content for visual feedback
+            const contentElements = submitButton.querySelectorAll('span, i');
+            contentElements.forEach(el => el.style.opacity = isLoading ? '0.5' : '1');
+        }
+
+        // Add event listener only if the form exists
+        if (feedbackForm && submitButton && feedbackTextInput) {
+            feedbackForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                hideFormMessage();
+
+                const comment = feedbackTextInput.value.trim();
+                const currentLangIsHi = languageToggle && languageToggle.checked;
+
+                if (!comment) {
+                    const errorMessage = currentLangIsHi ? 'कृपया अपनी प्रतिक्रिया दर्ज करें।' : 'Please enter your feedback.';
+                    showFormMessage(errorMessage, false);
+                    return;
+                }
+
+                setFormLoading(true);
+
+                const payload = {
+                    username: "Anonymous", // Explicitly anonymous for this page
+                    comment: comment
+                };
+
+                console.log("Sending feedback payload to:", FEEDBACK_API_ENDPOINT, payload);
+
+                try {
+                    const response = await fetch(FEEDBACK_API_ENDPOINT, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const responseData = await response.json();
+
+                    if (!response.ok) {
+                        // Attempt to get detail from common FastAPI error structure
+                        const errorDetail = responseData.detail || `Request failed with status ${response.status}`;
+                        throw new Error(errorDetail);
+                    }
+
+                    console.log("Feedback submitted successfully:", responseData);
+                    const successMsg = currentLangIsHi ? 'आपकी प्रतिक्रिया सफलतापूर्वक जमा कर दी गई है! धन्यवाद।' : 'Feedback submitted successfully! Thank you.';
+                    showFormMessage(successMsg, true);
+                    feedbackTextInput.value = ''; // Clear the textarea
+
+                } catch (error) {
+                    console.error('Error submitting feedback:', error);
+                    let detailedErrorMsg = error.message;
+                    if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
+                         detailedErrorMsg = currentLangIsHi ? 'नेटवर्क त्रुटि या सर्वर तक पहुंचने में असमर्थ। CORS समस्या या सर्वर डाउन हो सकता है।' : 'Network error or unable to reach server. Check CORS or if the server is running.';
+                    }
+                    const errorMsg = (currentLangIsHi ? 'प्रतिक्रिया जमा करने में त्रुटि हुई: ' : 'Error submitting feedback: ') + detailedErrorMsg;
+                    showFormMessage(errorMsg, false);
+                } finally {
+                    setFormLoading(false);
+                }
+            });
+        } else {
+            console.error("Required feedback form elements not found on the page.");
+        }
+
+        // Initialize theme and language settings when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSettings(); // Call the function defined in the base script block
+            console.log("Feedback page DOM Loaded and Initialized.");
+        });
+
+    </script>
+
+</body>
+</html>

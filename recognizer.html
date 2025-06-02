@@ -1,0 +1,686 @@
+
+
+<!-- this is index.html (Tailwind UI with Auth, OCR, Translation, Gender - Fixed Nav & OCR Prediction - REVISED OCR OUTPUT LAYOUT) -->
+<!DOCTYPE html>
+<html lang="en" class=""> <!-- Start without 'dark' initially -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Text Analysis - NIC Project</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <script>
+        // Tailwind config
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { primary: '#1a73e8', secondary: '#e8f0fe' },
+                    borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' }
+                }
+            }
+        }
+    </script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .hindi-font { font-family: 'Noto Sans Devanagari', sans-serif; }
+        .custom-switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .custom-switch-input { opacity: 0; width: 0; height: 0; }
+        .custom-switch-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .custom-switch-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        .custom-switch-input:checked + .custom-switch-slider { background-color: #1a73e8; }
+        .custom-switch-input:checked + .custom-switch-slider:before { transform: translateX(26px); }
+        *:focus-visible { outline: 2px solid #1a73e8; outline-offset: 2px; box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3); }
+        /* Base Dark Mode */
+        html.dark body { background-color: #1a202c; color: #e2e8f0; }
+        html.dark header, html.dark footer { background-color: #2d3748; color: #e2e8f0; }
+        html.dark .card, html.dark .auth-card, html.dark .result-card { background-color: #2d3748; border-color: #4a5568; }
+        html.dark h1, html.dark h2, html.dark h3, html.dark p, html.dark span, html.dark li, html.dark label, html.dark small, html.dark strong, html.dark button:not(.bg-red-500):not(.bg-green-600), html.dark a { color: #e2e8f0; } /* Adjusted a selector */
+        html.dark a.text-primary { color: #60a5fa; } /* Make sure primary links are visible */
+        html.dark .text-gray-600, html.dark .text-gray-700, html.dark .text-gray-800, html.dark .text-gray-900 { color: #a0aec0; }
+        html.dark .text-gray-500, html.dark .text-gray-400 { color: #718096; }
+        html.dark .text-muted { color: #718096; }
+        html.dark .bg-white { background-color: #2d3748 !important; }
+        html.dark .bg-gray-50 { background-color: #1a202c !important; }
+        html.dark .bg-gray-100 { background-color: #374151 !important; }
+        html.dark .border-gray-100, html.dark .border-gray-200 { border-color: #4a5568 !important; }
+        html.dark .hover\:bg-gray-50:hover { background-color: #4a5568 !important; }
+        /* Dark mode Forms */
+        html.dark input, html.dark textarea { background-color: #1f2937; border-color: #4b5563; color: #e5e7eb; }
+        html.dark input::placeholder, html.dark textarea::placeholder { color: #6b7280; }
+        html.dark .auth-link { color: #60a5fa; } html.dark .auth-link:hover { color: #93c5fd; }
+        html.dark .error-message { background-color: #450a0a; color: #fecaca; border-color: #7f1d1d; }
+        html.dark .spinner { border-color: rgba(255, 255, 255, 0.1); border-left-color: #60a5fa; }
+        /* Example Images */
+        .example-image-container { cursor: pointer; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; border: 1px solid transparent; aspect-ratio: 1 / 1; }
+        .example-image-container:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .example-image-container.selected { border: 2px solid #1a73e8; box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.3); }
+        .example-image { width: 100%; height: 100%; object-fit: contain; }
+        html.dark .example-image-container.selected { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3); }
+        html.dark .example-image-container { background-color: #4a5568; }
+        /* General Loading Spinner */
+        .spinner { border: 3px solid rgba(255, 255, 255, 0.3); width: 16px; height: 16px; border-radius: 50%; border-left-color: #fff; animation: spin 1s ease infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Error Message Styling */
+        .error-message { color: #dc2626; background-color: #fee2e2; padding: 0.75rem 1rem; border-radius: 8px; margin-top: 1rem; font-weight: 500; border: 1px solid #fecaca; font-size: 0.9rem; display: none; }
+        /* Result Images */
+        .result-image { max-width: 100%; height: auto; display: block; margin: 1rem auto 0 auto; border: 1px solid; border-radius: 8px; background-color: #eee; min-height: 100px; } /* Centered result image */
+        html.dark .result-image { background-color: #4a5568; border-color: #4a5568;}
+        /* Tab Styling */
+        .tab-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .tab-button.active { border-bottom-color: #1a73e8; color: #1a73e8; font-weight: 600; }
+        html.dark .tab-button.active { border-bottom-color: #60a5fa; color: #60a5fa; }
+        .tab-content { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+         /* Result Styling Refinements */
+         .result-card { background-color: #f9fafb; border: 1px solid #e5e7eb; margin-bottom: 1.5rem; padding: 1.5rem; border-radius: 8px; }
+         html.dark .result-card { background-color: #374151; border-color: #4b5563; }
+         .result-label { font-weight: 600; color: #4b5563; }
+         html.dark .result-label { color: #9ca3af; }
+         .result-value { font-weight: 500; word-break: break-word; }
+         html.dark .result-value { color: #e5e7eb; }
+         .result-item { display: grid; grid-template-columns: 1fr; gap: 0.25rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb; }
+         html.dark .result-item { border-color: #4b5563; }
+         .result-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+         @media (min-width: 768px) { .result-item { grid-template-columns: 150px 1fr; gap: 1rem; align-items: start; } .result-label { text-align: right; } } /* Grid for larger screens */
+         /* Loading Indicator general */
+        .loading-indicator { display: none; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; margin: 1.5rem 0; color: #6b7280; }
+        html.dark .loading-indicator { color: #9ca3af; }
+        .loading-indicator .spinner { width: 24px; height: 24px; border-width: 3px; }
+
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col text-gray-900 dark:text-gray-200">
+
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                 <!-- *** Updated Brand Name *** -->
+                <a href="/" class="text-2xl font-['Pacifico'] text-primary dark:text-blue-400 mr-8" data-lang-en="Recognition and Prediction" data-lang-hi="पहचान और पूर्वानुमान">Recognition and Prediction</a>
+                <!-- *** RESTORED Navigation Links *** -->
+                <nav id="mainNav" class="hidden md:flex space-x-6">
+                     <a href="index.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Home" data-lang-hi="होम">Home</a>
+                     <a href="recognizer.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-primary dark:text-blue-400 font-medium" data-lang-en="Recognize" data-lang-hi="पहचानें">Recognize</a> <!-- Current page? -->
+                    <a href="examples.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Examples" data-lang-hi="उदाहरण">Examples</a> <!-- Link to examples section? -->
+                     <a href="technology.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="Technology" data-lang-hi="तकनीक">Technology</a>
+                    <a href="about.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="About" data-lang-hi="बारे में">About</a>
+                    <a href="contact.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="contact" data-lang-hi="बारे में">contact</a>
+                    <a href="feedback.html" class="nav-link hover:text-primary dark:hover:text-blue-400 text-gray-600 dark:text-gray-300" data-lang-en="feedback" data-lang-hi="बारे में">feedback</a>
+                </nav>
+            </div>
+            <!-- Right side header items (Theme, Lang, Logout, etc.) -->
+            <div class="flex items-center space-x-4">
+                <div class="items-center space-x-2 hidden md:flex"> <span class="text-sm text-gray-600 dark:text-gray-400">EN</span> <label class="custom-switch"><input type="checkbox" id="languageToggle" class="custom-switch-input"><span class="custom-switch-slider"></span></label> <span class="text-sm text-gray-600 dark:text-gray-400 hindi-font">हिंदी</span> </div>
+                <div class="items-center space-x-2 hidden md:flex"> <span class="text-sm text-gray-600 dark:text-gray-400"><i class="ri-sun-line"></i></span> <label class="custom-switch"><input type="checkbox" id="themeToggle" class="custom-switch-input"><span class="custom-switch-slider"></span></label> <span class="text-sm text-gray-600 dark:text-gray-400"><i class="ri-moon-line"></i></span> </div>
+                <button id="logoutButton" class="hidden bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-button text-sm inline-flex items-center gap-1"> <i class="ri-logout-box-r-line"></i> <span data-lang-en="Logout" data-lang-hi="लॉग आउट">Logout</span> </button>
+               <!-- <div id="userInfoIcons" class="hidden md:flex items-center space-x-4"> <div class="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full cursor-pointer" title="User Profile (Placeholder)"><i class="ri-user-line text-gray-600 dark:text-gray-300"></i></div> </div>-->
+                <button class="md:hidden w-10 h-10 flex items-center justify-center" aria-label="Toggle Menu"><i class="ri-menu-line text-gray-600 dark:text-gray-300 text-xl"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== Authentication Container ===== -->
+    <div id="authContainer" class="flex-grow flex items-center justify-center p-4">
+         <!-- Login/Signup Forms (Keep as is) -->
+         <div class="w-full max-w-md"> <form id="loginForm" class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 auth-card"> <h2 class="text-2xl font-semibold text-center text-gray-800 dark:text-white mb-6" data-lang-en="Login" data-lang-hi="लॉग इन करें">Login</h2> <div id="loginErrorDiv" class="error-message"></div> <div class="mb-4"> <label for="loginUsername" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-lang-en="Username" data-lang-hi="उपयोगकर्ता नाम">Username</label> <input type="text" id="loginUsername" required autocomplete="username" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"> </div> <div class="mb-6"> <label for="loginPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-lang-en="Password" data-lang-hi="पासवर्ड">Password</label> <input type="password" id="loginPassword" required autocomplete="current-password" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"> </div> <button type="submit" id="loginSubmitButton" class="w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-button shadow-sm text-sm font-medium text-white bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-gray-800 disabled:opacity-50"> <span data-lang-en="Login" data-lang-hi="लॉग इन करें">Login</span><div class="spinner hidden"></div> </button> <p class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400"> <span data-lang-en="Don't have an account?" data-lang-hi="खाता नहीं है?">Don't have an account?</span> <a href="#" id="showSignupLink" class="font-medium text-primary hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 auth-link" data-lang-en="Sign up" data-lang-hi="साइन अप करें">Sign up</a> </p> </form> <form id="signupForm" class="hidden bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 auth-card"> <h2 class="text-2xl font-semibold text-center text-gray-800 dark:text-white mb-6" data-lang-en="Sign Up" data-lang-hi="साइन अप करें">Sign Up</h2> <div id="signupErrorDiv" class="error-message"></div> <div class="mb-4"><label for="signupUsername" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-lang-en="Username" data-lang-hi="उपयोगकर्ता नाम">Username</label><input type="text" id="signupUsername" required minlength="3" maxlength="50" autocomplete="username" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"></div> <div class="mb-4"><label for="signupEmail" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-lang-en="Email" data-lang-hi="ईमेल">Email</label><input type="email" id="signupEmail" required autocomplete="email" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"></div> <div class="mb-6"><label for="signupPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-lang-en="Password (min. 6 chars)" data-lang-hi="पासवर्ड (न्यून. 6 अक्षर)">Password (min. 6 chars)</label><input type="password" id="signupPassword" required minlength="6" autocomplete="new-password" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"></div> <button type="submit" id="signupSubmitButton" class="w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-button shadow-sm text-sm font-medium text-white bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-gray-800 disabled:opacity-50"> <span data-lang-en="Sign Up" data-lang-hi="साइन अप करें">Sign Up</span><div class="spinner hidden"></div> </button> <p class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400"> <span data-lang-en="Already have an account?" data-lang-hi="पहले से ही खाता है?">Already have an account?</span> <a href="#" id="showLoginLink" class="font-medium text-primary hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 auth-link" data-lang-en="Login" data-lang-hi="लॉग इन करें">Login</a> </p> </form> </div>
+    </div>
+
+    <!-- ===== Main Application Container ===== -->
+    <main id="appContainer" class="hidden flex-grow container mx-auto px-4 py-8">
+
+        <!-- Tab Navigation -->
+        <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
+            <nav class="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs"> <!-- Added overflow-x-auto -->
+                <button class="tab-button active whitespace-nowrap py-4 px-1 text-sm font-medium flex items-center gap-2" data-tab="ocr"> <i class="ri-image-line text-lg"></i> <span data-lang-en="Hindi OCR" data-lang-hi="हिन्दी ओसीआर">Hindi OCR</span> </button>
+                <button class="tab-button whitespace-nowrap py-4 px-1 text-sm font-medium flex items-center gap-2" data-tab="translation"> <i class="ri-translate-2 text-lg"></i> <span data-lang-en="Translation" data-lang-hi="अनुवाद">Translation</span> </button>
+                <button class="tab-button whitespace-nowrap py-4 px-1 text-sm font-medium flex items-center gap-2" data-tab="gender"> <i class="ri-men-line text-lg"></i><i class="ri-women-line text-lg -ml-1"></i> <span data-lang-en="Gender Prediction" data-lang-hi="लिंग भविष्यवाणी">Gender Prediction</span> </button>
+            </nav>
+        </div>
+
+        <!-- Tab Content Area -->
+        <div>
+            <!-- OCR Tab Content -->
+            <div id="ocrContent" class="tab-content active">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                    <!-- Input Column -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 card">
+                         <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 flex items-center gap-2"> <i class="ri-image-add-line text-primary dark:text-blue-400"></i><span data-lang-en="Input Image" data-lang-hi="इनपुट छवि">Input Image</span> </h2>
+                         <p class="text-gray-600 dark:text-gray-400 text-sm mb-4" data-lang-en="Upload a Hindi word image (PNG, JPG, JPEG) or select an example." data-lang-hi="एक हिन्दी शब्द छवि (PNG, JPG, JPEG) अपलोड करें या उदाहरण चुनें।">Upload a Hindi word image (PNG, JPG, JPEG) or select an example.</p>
+                        <input type="file" id="imageUpload" accept="image/png, image/jpeg, image/jpg" class="hidden"/>
+                        <div class="flex items-center mb-4"><label for="imageUpload" class="bg-primary text-white px-4 py-2 rounded-button cursor-pointer hover:bg-blue-700 transition-colors text-sm inline-flex items-center mr-4 whitespace-nowrap gap-2"><i class="ri-upload-2-line"></i><span data-lang-en="Choose File" data-lang-hi="फ़ाइल चुनें">Choose File</span></label><span id="fileName" class="text-gray-500 dark:text-gray-400 text-sm italic truncate" data-lang-en="No file chosen" data-lang-hi="कोई फ़ाइल नहीं चुनी गई">No file chosen</span></div>
+                        <h3 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-2" data-lang-en="Examples" data-lang-hi="उदाहरण">Examples</h3>
+                        <div id="examplesContainer" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 mb-4"><div class="col-span-full"><span id="examplesLoadingText" class="text-gray-500 dark:text-gray-400 text-sm" data-lang-en="Loading examples..." data-lang-hi="उदाहरण लोड हो रहे हैं...">Loading examples...</span></div></div>
+                        <div id="imagePreviewContainer" class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 hidden"><h3 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-2 text-center" data-lang-en="Preview" data-lang-hi="पूर्वावलोकन">Preview</h3><div class="flex justify-center items-center bg-gray-50 dark:bg-gray-700 dark:border-gray-600 rounded border p-1 min-h-[100px]"><img id="imagePreview" src="#" alt="Image Preview" class="max-h-60 w-auto rounded"/></div></div>
+                        <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600 flex gap-4">
+                             <button id="predictButton" class="flex-1 bg-green-600 text-white px-6 py-3 rounded-button font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg inline-flex items-center justify-center gap-2" disabled><i class="ri-search-line"></i><span data-lang-en="Recognize" data-lang-hi="पहचानें">Recognize</span></button>
+                             <button id="clearButton" class="flex-none bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-button text-lg inline-flex items-center justify-center gap-2 hidden"><i class="ri-delete-bin-line"></i><span data-lang-en="Clear" data-lang-hi="साफ़ करें">Clear</span></button>
+                        </div>
+                         <div id="errorMessage" class="error-message mt-4"></div>
+                    </div>
+
+                    <!-- ***** MODIFIED Output Column ***** -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 flex flex-col items-center card">
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 w-full text-center flex items-center justify-center gap-2"><i class="ri-text text-primary dark:text-blue-400"></i><span data-lang-en="Recognition Result" data-lang-hi="पहचान परिणाम">Recognition Result</span></h2>
+                        <div id="loadingIndicator" class="loading-indicator w-full"><div class="spinner"></div><span id="loadingText" data-lang-en="Processing... Please wait." data-lang-hi="संसाधित हो रहा है... कृपया प्रतीक्षा करें।">Processing...</span></div>
+                        <div id="resultDisplay" class="mt-4 w-full text-center hidden space-y-6">
+
+                             <!-- *** MOVED Word Detection Section First *** -->
+                             <div class="result-card !p-4"> <!-- Adjusted padding -->
+                                 <h3 class="text-md font-semibold text-center mb-2" data-lang-en="Word Detection" data-lang-hi="शब्द पहचान">Word Detection</h3>
+                                 <img id="wordDetectionImg" src="#" alt="Word Detection Preview" class="result-image" style="display: none;">
+                             </div>
+
+                            <!-- *** REMOVED Recognized Text Section *** -->
+                            <!-- The div containing ocrRecognizedText and wordCountText has been deleted -->
+
+                            <!-- Raw Detector Output Section (Now Second) -->
+                            <div class="result-card">
+                                <h3 class="text-md font-semibold mb-2" data-lang-en="Output:" data-lang-hi="आउटपुट:">Output:</h3>
+                                <pre id="sakshiOutputText" class="text-xs text-left whitespace-pre-wrap break-words max-h-40 overflow-y-auto bg-gray-50 dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-600"></pre>
+                            </div>
+
+                        </div>
+                        <p id="initialMessageOutput" class="text-gray-500 dark:text-gray-400 mt-6 text-center" data-lang-en="Results will appear here." data-lang-hi="परिणाम यहां दिखाई देंगे।">Results will appear here.</p>
+                    </div>
+                    <!-- ***** End of MODIFIED Output Column ***** -->
+
+                </div>
+            </div>
+
+            <!-- Translation Tab Content -->
+            <div id="translationContent" class="tab-content">
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                     <!-- Translation Input -->
+                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 card">
+                         <h2 class="text-xl font-semibold mb-4 border-b pb-2 flex items-center gap-2"><i class="ri-translate-2 text-primary dark:text-blue-400"></i><span data-lang-en="Translate Text" data-lang-hi="पाठ का अनुवाद करें">Translate Text</span></h2>
+                         <div class="mb-4">
+                            <label for="textToTranslate" class="block text-sm font-medium mb-1" data-lang-en="Text to Translate:" data-lang-hi="अनुवाद के लिए पाठ:">Text to Translate:</label>
+                            <textarea id="textToTranslate" rows="5" placeholder="Enter text here..." class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600"></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label for="sourceLanguage" class="block text-sm font-medium mb-1" data-lang-en="Source Language (Optional):" data-lang-hi="स्रोत भाषा (वैकल्पिक):">Source Language (Optional):</label>
+                            <input type="text" id="sourceLanguage" placeholder="Leave empty for auto-detection" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600">
+                        </div>
+                        <div class="mb-4">
+                            <label for="targetLanguage" class="block text-sm font-medium mb-1" data-lang-en="Target Language:" data-lang-hi="लक्ष्य भाषा:">Target Language:</label>
+                            <input type="text" id="targetLanguage" placeholder="e.g., English, Hindi, French" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" data-lang-en="Enter target language name (e.g., English)." data-lang-hi="लक्ष्य भाषा का नाम दर्ज करें (उदा., English)।">Enter target language name (e.g., English).</p>
+                        </div>
+                        <button id="translateButton" class="w-full bg-primary text-white px-4 py-2 rounded-button hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2">
+                            <i class="ri-translate"></i><span data-lang-en="Translate" data-lang-hi="अनुवाद करें">Translate</span>
+                        </button>
+                        <div id="translationError" class="error-message mt-4"></div>
+                    </div>
+                    <!-- Translation Output -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 card">
+                       <h2 class="text-xl font-semibold mb-4 border-b pb-2 flex items-center gap-2"><i class="ri-chat-check-line text-primary dark:text-blue-400"></i><span data-lang-en="Translation Result" data-lang-hi="अनुवाद परिणाम">Translation Result</span></h2>
+                       <div id="translationLoading" class="loading-indicator"><div class="spinner"></div><span data-lang-en="Translating..." data-lang-hi="अनुवाद हो रहा है...">Translating...</span></div>
+                       <div id="translationResultDisplay" class="hidden space-y-4">
+                           <div class="result-item !border-none !pb-0"> <div class="result-label" data-lang-en="Source Language:" data-lang-hi="स्रोत भाषा:">Source Language:</div> <div id="detectedSourceLanguage" class="result-value font-medium"></div> </div>
+                            <div class="result-item !border-none !pb-0"> <div class="result-label" data-lang-en="Target Language:" data-lang-hi="लक्ष्य भाषा:">Target Language:</div> <div id="translationTargetLanguage" class="result-value font-medium"></div> </div>
+                           <div class="mt-2"> <div class="result-label mb-1" data-lang-en="Translated Text:" data-lang-hi="अनुवादित पाठ:">Translated Text:</div> <div id="translatedText" class="result-value p-3 bg-gray-100 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 min-h-[100px] whitespace-pre-wrap"></div> </div>
+                       </div>
+                        <p id="initialMessageTranslation" class="text-gray-500 dark:text-gray-400 mt-6 text-center" data-lang-en="Enter text and languages, then click Translate." data-lang-hi="पाठ और भाषाएँ दर्ज करें, फिर अनुवाद करें पर क्लिक करें।">Enter text and languages, then click Translate.</p>
+                    </div>
+                </div>
+           </div>
+
+           <!-- Gender Prediction Tab Content -->
+           <div id="genderContent" class="tab-content">
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                    <!-- Gender Input -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 card">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2 flex items-center gap-2"><i class="ri-user-search-line text-primary dark:text-blue-400"></i><span data-lang-en="Predict Gender from Names" data-lang-hi="नामों से लिंग की भविष्यवाणी करें">Predict Gender from Names</span></h2>
+                        <div class="mb-4">
+                            <label for="namesInput" class="block text-sm font-medium mb-1" data-lang-en="Enter Names (comma-separated):" data-lang-hi="नाम दर्ज करें (अल्पविराम से अलग):">Enter Names (comma-separated):</label>
+                            <textarea id="namesInput" rows="5" placeholder="e.g., Priya, Rahul, Alex, Sam" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600"></textarea>
+                        </div>
+                        <button id="predictGenderButton" class="w-full bg-primary text-white px-4 py-2 rounded-button hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2">
+                            <i class="ri-men-line"></i><i class="ri-women-line -ml-1"></i><span data-lang-en="Predict Gender" data-lang-hi="लिंग की भविष्यवाणी करें">Predict Gender</span>
+                        </button>
+                        <div id="genderError" class="error-message mt-4"></div>
+                    </div>
+                    <!-- Gender Output -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 card">
+                       <h2 class="text-xl font-semibold mb-4 border-b pb-2 flex items-center gap-2"><i class="ri-bar-chart-2-line text-primary dark:text-blue-400"></i><span data-lang-en="Prediction Results" data-lang-hi="भविष्यवाणी परिणाम">Prediction Results</span></h2>
+                       <div id="genderLoading" class="loading-indicator"><div class="spinner"></div><span data-lang-en="Analyzing..." data-lang-hi="विश्लेषण हो रहा है...">Analyzing...</span></div>
+                       <div id="genderResultDisplay" class="hidden space-y-4"> <!-- Results populated here --> </div>
+                        <p id="initialMessageGender" class="text-gray-500 dark:text-gray-400 mt-6 text-center" data-lang-en="Enter names and click Predict." data-lang-hi="नाम दर्ज करें और भविष्यवाणी पर क्लिक करें।">Enter names and click Predict.</p>
+                   </div>
+                </div>
+           </div>
+       </div>
+
+   </main>
+
+
+   <!-- Footer -->
+   <footer class="bg-gray-900 text-gray-400 py-12"> <!-- Adjusted footer text color -->
+       <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <!-- Add data-lang attributes to footer elements if needed -->
+                   <a href="/" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block" data-lang-en="Recognition and Prediction" data-lang-hi="पहचान और पूर्वानुमान">Recognition and Prediction</a>
+                   <p class="mb-4 text-sm" data-lang-en="A system for recognizing Hindi handwritten text, predicting gender from content, and translating it into other languages." data-lang-hi="हिंदी हस्तलिखित पाठ की पहचान, सामग्री के आधार पर लिंग पूर्वानुमान और अनुवाद करने वाली एक प्रणाली।">A system for recognizing Hindi handwritten text, predicting gender from content, and translating it into other languages.</p>
+                   <div class="flex space-x-4">
+                       <!-- <a href="#" class="hover:text-white" title="GitHub (Placeholder)"><i class="ri-github-fill"></i></a>-->
+                       <!-- <a href="#" class="hover:text-white" title="LinkedIn (Placeholder)"><i class="ri-linkedin-box-fill"></i></a>-->
+                   </div>
+               </div>
+                <div>
+                   <h3 class="text-lg font-medium text-white mb-4" data-lang-en="Quick Links" data-lang-hi="त्वरित लिंक्स">Quick Links</h3>
+                   <ul class="space-y-2 text-sm">
+                       <li><a href="/" class="hover:text-white" data-lang-en="Home" data-lang-hi="होम">Home</a></li>
+                       <li><a href="/recognize" class="hover:text-white" data-lang-en="Recognize" data-lang-hi="पहचानें">Recognize</a></li>
+                       <li><a href="/examples" class="hover:text-white" data-lang-en="Examples" data-lang-hi="उदाहरण">Examples</a></li>
+                        <li><a href="/technology" class="hover:text-white" data-lang-en="Technology" data-lang-hi="तकनीक">Technology</a></li>
+                       <li><a href="/about" class="hover:text-white" data-lang-en="About" data-lang-hi="बारे में">About</a></li>
+                       <li><a href="/contact" class="hover:text-white" data-lang-en="Contact Us" data-lang-hi="संपर्क">Contact Us</a></li>
+                       <li><a href="/feedback" class="hover:text-white" data-lang-en="Feedback" data-lang-hi="प्रतिक्रिया">Feedback</a></li>
+
+
+                   </ul>
+               </div>
+                <!--<div>
+                   <h3 class="text-lg font-medium text-white mb-4" data-lang-en="Resources" data-lang-hi="संसाधन">Resources</h3>
+                   <ul class="space-y-2 text-sm">
+                       <li><a href="#" class="hover:text-white" data-lang-en="Documentation (TBD)" data-lang-hi="प्रलेखन (TBD)">Documentation (TBD)</a></li>
+                       <li><a href="#" class="hover:text-white" data-lang-en="GitHub Repo (Link)" data-lang-hi="गिटहब रेपो (लिंक)">GitHub Repo (Link)</a></li>
+                       <li><a href="#" class="hover:text-white" data-lang-en="Support (TBD)" data-lang-hi="समर्थन (TBD)">Support (TBD)</a></li>
+                   </ul>
+               </div>-->
+                <div>
+                   <h3 class="text-lg font-medium text-white mb-4" data-lang-en="Contact (Project)" data-lang-hi="संपर्क (परियोजना)">Contact (Project)</h3>
+                   <ul class="space-y-2 text-sm">
+                       <li class="flex items-start">
+                           <i class="ri-mail-line mt-1 mr-2"></i>
+                           <span>sdevilgv@gmail.com</span>
+                       </li>
+                       <li class="flex items-center">
+                           <i class="ri-building-line mr-2"></i>
+                           <span>NIC Durg</span>
+                       </li>
+                   </ul>
+               </div>
+           </div>
+           <!-- Copyright -->
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+               <p class="text-sm">© 2025 D. Sakshi | Final Year Project | NIC Durg</p>
+           </div>
+       </div>
+   </footer>
+
+
+   <!-- Base Theme/Language Script -->
+   <script>
+       // Theme Toggle (Keep as is)
+       const themeToggle = document.getElementById('themeToggle'); const htmlElement = document.documentElement; function applyTheme(isDark) { if (isDark) { htmlElement.classList.add('dark'); if(themeToggle) themeToggle.checked = true; } else { htmlElement.classList.remove('dark'); if(themeToggle) themeToggle.checked = false; } } const prefersDark = localStorage.getItem('theme') === 'dark' || (localStorage.getItem('theme') === null && window.matchMedia('(prefers-color-scheme: dark)').matches); applyTheme(prefersDark); if(themeToggle){ themeToggle.addEventListener('change', (event) => { const isDark = event.target.checked; applyTheme(isDark); localStorage.setItem('theme', isDark ? 'dark' : 'light'); }); } else { console.warn("Theme toggle button not found."); }
+       // Language Toggle (Keep as is)
+       const languageToggle = document.getElementById('languageToggle'); const langElements = document.querySelectorAll('[data-lang-en]'); function applyLanguage(lang) { htmlElement.setAttribute('lang', lang); langElements.forEach(el => { const text = el.getAttribute(`data-lang-${lang}`); if (text) { const icon = el.querySelector('i'); if (icon && el.childNodes.length > 1) { let updated = false; el.childNodes.forEach(node => { if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') { node.textContent = ` ${text} `; updated = true; } }); if (!updated) { const currentText = el.getAttribute(`data-lang-${lang === 'en' ? 'hi' : 'en'}`); if(currentText) el.innerHTML = el.innerHTML.replace(currentText, text);}} else { el.textContent = text; } } }); if (languageToggle) languageToggle.checked = (lang === 'hi'); localStorage.setItem('language', lang); } const savedLang = localStorage.getItem('language') || 'en'; if (languageToggle) { languageToggle.addEventListener('change', (event) => { const newLang = event.target.checked ? 'hi' : 'en'; applyLanguage(newLang); }); } else { console.warn("Language toggle button not found."); }
+   </script>
+
+   <!-- ***** Page Interaction & Full App Script (MODIFIED) ***** -->
+   <script>
+       // --- API Configuration ---
+       const OCR_API_BASE_URL = 'https://sameernotes-ocr.hf.space';
+       const TRANSLATION_API_BASE_URL = 'https://sameernotes-translation-prediction-space.hf.space';
+       const GENDER_API_BASE_URL = "https://sidvilas-gender-prediction-space.hf.space";
+       const TOKEN_ENDPOINT = `${OCR_API_BASE_URL}/token`;
+       const SIGNUP_ENDPOINT = `${OCR_API_BASE_URL}/signup`;
+       const PROCESS_ENDPOINT = `${OCR_API_BASE_URL}/process/`;
+       const WORD_DETECT_ENDPOINT = `${OCR_API_BASE_URL}/word-detection/`;
+       // const PREDICTION_IMG_ENDPOINT = `${OCR_API_BASE_URL}/prediction/`; // Removed
+       const TRANSLATE_ENDPOINT = `${TRANSLATION_API_BASE_URL}/translate`;
+       const GENDER_PREDICT_ENDPOINT = `${GENDER_API_BASE_URL}/predict`;
+       const TOKEN_STORAGE_KEY = 'aiTextToolsAuthToken';
+
+       // --- State Variables ---
+       let accessToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+       let currentImageSource = null;
+       let currentExampleSelection = null;
+
+       // --- DOM Elements ---
+       // Auth & Core App
+       const authContainer = document.getElementById('authContainer');
+       const appContainer = document.getElementById('appContainer');
+       const loginForm = document.getElementById('loginForm');
+       const signupForm = document.getElementById('signupForm');
+       const loginUsernameInput = document.getElementById('loginUsername');
+       const loginPasswordInput = document.getElementById('loginPassword');
+       const loginErrorDiv = document.getElementById('loginErrorDiv');
+       const loginSubmitButton = document.getElementById('loginSubmitButton');
+       const signupUsernameInput = document.getElementById('signupUsername');
+       const signupEmailInput = document.getElementById('signupEmail');
+       const signupPasswordInput = document.getElementById('signupPassword');
+       const signupErrorDiv = document.getElementById('signupErrorDiv');
+       const signupSubmitButton = document.getElementById('signupSubmitButton');
+       const showSignupLink = document.getElementById('showSignupLink');
+       const showLoginLink = document.getElementById('showLoginLink');
+       const logoutButton = document.getElementById('logoutButton');
+       const mainNav = document.getElementById('mainNav');
+       const userInfoIcons = document.getElementById('userInfoIcons');
+       // Tabs
+       const tabButtons = document.querySelectorAll('.tab-button');
+       const tabContents = document.querySelectorAll('.tab-content');
+       // OCR Input
+       const imageUpload = document.getElementById('imageUpload');
+       const fileNameSpan = document.getElementById('fileName');
+       const examplesContainer = document.getElementById('examplesContainer');
+       const examplesLoadingText = document.getElementById('examplesLoadingText');
+       const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+       const imagePreview = document.getElementById('imagePreview');
+       const predictButton = document.getElementById('predictButton');
+       const clearButton = document.getElementById('clearButton');
+       const errorMessage = document.getElementById('errorMessage');
+       // OCR Output
+       const loadingIndicator = document.getElementById('loadingIndicator');
+       const loadingText = document.getElementById('loadingText');
+       const resultDisplay = document.getElementById('resultDisplay');
+       // const ocrRecognizedText = document.getElementById('ocrRecognizedText'); // *** REMOVED ***
+       // const wordCountText = document.getElementById('wordCountText'); // *** REMOVED ***
+       const sakshiOutputText = document.getElementById('sakshiOutputText');
+       const wordDetectionImg = document.getElementById('wordDetectionImg');
+       // const predictionImg = document.getElementById('predictionImg'); // Removed
+       const initialMessageOutput = document.getElementById('initialMessageOutput');
+       // Translation
+       const textToTranslateInput = document.getElementById('textToTranslate');
+       const sourceLanguageInput = document.getElementById('sourceLanguage');
+       const targetLanguageInput = document.getElementById('targetLanguage');
+       const translateButton = document.getElementById('translateButton');
+       const translationLoading = document.getElementById('translationLoading');
+       const translationResultDisplay = document.getElementById('translationResultDisplay');
+       const detectedSourceLanguage = document.getElementById('detectedSourceLanguage');
+       const translationTargetLanguage = document.getElementById('translationTargetLanguage');
+       const translatedText = document.getElementById('translatedText');
+       const translationError = document.getElementById('translationError');
+       const initialMessageTranslation = document.getElementById('initialMessageTranslation');
+       // Gender Prediction
+       const namesInput = document.getElementById('namesInput');
+       const predictGenderButton = document.getElementById('predictGenderButton');
+       const genderLoading = document.getElementById('genderLoading');
+       const genderResultDisplay = document.getElementById('genderResultDisplay');
+       const genderError = document.getElementById('genderError');
+       const initialMessageGender = document.getElementById('initialMessageGender');
+
+       // --- Example Images ---
+       const exampleImages = [
+ { name: "अखिल", url: "samples/अखिल.png" }, // Assuming a relative path based on the image structure
+ { name: "अग्रसर", url: "samples/अग्रसर.png" },
+ { name: "अंतर्राष्ट्रीय", url: "samples/अंतर्राष्ट्रीय.png" },
+ { name: "अध्ययन", url: "samples/अध्ययन.png" },
+ { name: "अनुसंधान", url: "samples/अनुसंधान.png" },
+ { name: "अन्य", url: "samples/अन्य.png" },
+ { name: "अलावा", url: "samples/अलावा.png" },
+ { name: "अवसर", url: "samples/अवसर.png" },
+ { name: "आती", url: "samples/आती.png" },
+ { name: "आधुनिक", url: "samples/आधुनिक.png" }
+];
+       // --- Helper Functions (Auth UI, Error, Loading) ---
+       // ... (Keep showAuthScreen, showAppScreen, displayError, hideError, showAuthLoading, showLoadingIndicator, showOcrLoading functions exactly as in the previous version) ...
+       function showAuthScreen() { console.log("Showing Auth Screen"); accessToken = null; localStorage.removeItem(TOKEN_STORAGE_KEY); if (authContainer) authContainer.classList.remove('hidden'); if (appContainer) appContainer.classList.add('hidden'); if (mainNav) mainNav.classList.add('hidden'); if (userInfoIcons) userInfoIcons.classList.add('hidden'); if (logoutButton) logoutButton.classList.add('hidden'); hideError(loginErrorDiv); hideError(signupErrorDiv); if(loginForm) loginForm.classList.remove('hidden'); if(signupForm) signupForm.classList.add('hidden'); if(loginUsernameInput) loginUsernameInput.value = ''; if(loginPasswordInput) loginPasswordInput.value = ''; }
+       function showAppScreen() { console.log("Showing App Screen"); if (!accessToken) { showAuthScreen(); return; } if (authContainer) authContainer.classList.add('hidden'); if (appContainer) appContainer.classList.remove('hidden'); if (mainNav) mainNav.classList.remove('hidden', 'md:flex'); if (mainNav) mainNav.classList.add('md:flex'); if (userInfoIcons) userInfoIcons.classList.remove('hidden', 'md:flex'); if (userInfoIcons) userInfoIcons.classList.add('md:flex'); if (logoutButton) logoutButton.classList.remove('hidden'); loadExamples(); activateTab('ocr'); }
+       function displayError(element, message) { if (element) { element.textContent = message; element.classList.remove('hidden'); console.warn("Error:", message); } else { console.error("Element missing for error:", message); } }
+       function hideError(element) { if (element) { element.classList.add('hidden'); element.textContent = ''; } }
+       function showAuthLoading(formType, isLoading) { const button = formType === 'login' ? loginSubmitButton : signupSubmitButton; if (!button) return; const spinner = button.querySelector('.spinner'); button.disabled = isLoading; if (spinner) spinner.classList.toggle('hidden', !isLoading); }
+       function showLoadingIndicator(element, show = true) { if (element) { element.style.display = show ? 'flex' : 'none'; } }
+       function showOcrLoading(isLoading, message = "Processing...") { if (loadingIndicator) { loadingIndicator.classList.toggle('hidden', !isLoading); if (loadingText) loadingText.textContent = message; } if (predictButton) predictButton.disabled = isLoading; if (clearButton) clearButton.disabled = isLoading; }
+
+
+       // --- Generic Authenticated Fetch ---
+       // ... (Keep authenticatedFetch function exactly as in the previous correct version) ...
+       async function authenticatedFetch(url, options = {}) { if (!accessToken) { showAuthScreen(); throw new Error("Not authenticated."); } const defaultOptions = { headers: { 'Authorization': `Bearer ${accessToken}`, 'Accept': 'application/json', ...options.headers }, }; if (options.body && !(options.body instanceof FormData) && !(options.body instanceof URLSearchParams) && !defaultOptions.headers['Content-Type']) { defaultOptions.headers['Content-Type'] = 'application/json'; } const finalOptions = { ...options, ...defaultOptions }; /* console.log("Auth Fetch:", url); */ try { const response = await fetch(url, finalOptions); /* console.log(`Status ${url}:`, response.status); */ if (!response.ok) { let errorData = { detail: `Request failed: ${response.status}` }; let bodyText = ''; try { bodyText = await response.text(); errorData = JSON.parse(bodyText); if (!errorData.detail) errorData.detail = bodyText; } catch (e) { errorData.detail = bodyText || errorData.detail; } console.error(`API Error ${url}:`, response.status, errorData.detail); if (response.status === 401) { showAuthScreen(); throw new Error("Auth failed/expired."); } throw new Error(typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail)); } const contentType = response.headers.get("content-type"); if (response.status === 204) return null; if (contentType?.includes("application/json")) return await response.json(); if (contentType?.includes("image/") || contentType?.includes("application/octet-stream")) return await response.blob(); return await response.text(); } catch (error) { console.error(`Fetch Catch ${url}:`, error); throw error; } }
+
+       // --- LOGIN / SIGNUP / LOGOUT ---
+       // ... (Keep handleLogin, handleSignup, handleLogout functions exactly as in the previous correct version) ...
+       if (loginForm) { loginForm.addEventListener('submit', async (event) => { event.preventDefault(); const username = loginUsernameInput.value.trim(); const password = loginPasswordInput.value.trim(); hideError(loginErrorDiv); if (!username || !password) { displayError(loginErrorDiv, "Username & Password required."); return; } const body = new URLSearchParams(); body.append('username', username); body.append('password', password); showAuthLoading('login', true); try { const response = await fetch(TOKEN_ENDPOINT, { method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json'}, body: body }); const data = await response.json().catch(() => null); if (!response.ok) { throw new Error(data?.detail || `Login failed (${response.status})`); } if (data?.access_token) { accessToken = data.access_token; localStorage.setItem(TOKEN_STORAGE_KEY, accessToken); console.log("Login success."); showAppScreen(); } else { throw new Error('No access token received.'); } } catch (error) { let msg = error.message || "Unknown login error."; if (msg.includes("Incorrect")) msg = "Incorrect username or password."; if (error instanceof TypeError) msg = "Network error."; displayError(loginErrorDiv, msg); } finally { showAuthLoading('login', false); } }); }
+       if (signupForm) { signupForm.addEventListener('submit', async (event) => { event.preventDefault(); const username = signupUsernameInput.value.trim(); const email = signupEmailInput.value.trim(); const password = signupPasswordInput.value.trim(); hideError(signupErrorDiv); if (!username || !email || !password) { displayError(signupErrorDiv, "Please fill all fields."); return; } if (password.length < 6) { displayError(signupErrorDiv, "Password must be >= 6 characters."); return; } if (!/\S+@\S+\.\S+/.test(email)) { displayError(signupErrorDiv, "Invalid email format."); return; } showAuthLoading('signup', true); try { const response = await fetch(SIGNUP_ENDPOINT, { method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}, body: JSON.stringify({ username, email, password }) }); const data = await response.json().catch(() => null); if (!response.ok) { throw new Error(data?.detail || `Signup failed (${response.status})`); } console.log("Signup successful:", data); alert('Signup successful! Please login.'); if(signupForm) signupForm.classList.add('hidden'); if(loginForm) loginForm.classList.remove('hidden'); signupUsernameInput.value = ''; signupEmailInput.value = ''; signupPasswordInput.value = ''; } catch (error) { let msg = error.message || "Unknown signup error."; if (error instanceof TypeError) msg = "Network error."; displayError(signupErrorDiv, msg); } finally { showAuthLoading('signup', false); } }); }
+       if(logoutButton) logoutButton.addEventListener('click', () => { showAuthScreen(); clearOCRState(); clearTranslationState(); clearGenderState(); });
+       if (showSignupLink) showSignupLink.addEventListener('click', (e) => { e.preventDefault(); if(loginForm) loginForm.classList.add('hidden'); if(signupForm) signupForm.classList.remove('hidden'); hideError(loginErrorDiv); hideError(signupErrorDiv); });
+       if (showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); if(signupForm) signupForm.classList.add('hidden'); if(loginForm) loginForm.classList.remove('hidden'); hideError(loginErrorDiv); hideError(signupErrorDiv); });
+
+
+       // --- TAB MANAGEMENT ---
+       function activateTab(tabId) { /* ... (Keep implementation) ... */ tabButtons.forEach(b => { b.classList.toggle('active', b.dataset.tab === tabId); }); tabContents.forEach(c => { c.classList.toggle('active', c.id === `${tabId}Content`); }); console.log("Activated tab:", tabId); }
+       tabButtons.forEach(button => { button.addEventListener('click', () => activateTab(button.dataset.tab)); });
+
+       // --- OCR Functionality ---
+       function loadExamples() { /* ... (Keep implementation) ... */ if (!examplesContainer || !appContainer || appContainer.classList.contains('hidden')) return; if (examplesLoadingText) examplesContainer.innerHTML = ''; const examplesToShow = exampleImages.slice(0, 12); examplesToShow.forEach((imgData, index) => { const div = document.createElement('div'); div.className = 'example-image-container bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden border border-gray-200 dark:border-gray-600'; div.setAttribute('role', 'button'); div.setAttribute('tabindex', '0'); div.setAttribute('aria-label', `Example ${index + 1}: ${imgData.name}`); div.dataset.imageUrl = imgData.url; div.dataset.imageName = imgData.name; const img = document.createElement('img'); img.src = imgData.url; img.alt = `Example ${index + 1}: ${imgData.name}`; img.className = 'example-image'; img.loading = 'lazy'; img.onerror = () => { div.innerHTML = `<span class="text-xs text-red-500 p-1">Load Error</span>`; }; div.appendChild(img); div.addEventListener('click', () => handleExampleClick(div, imgData.url, imgData.name)); div.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleExampleClick(div, imgData.url, imgData.name); } }); examplesContainer.appendChild(div); }); }
+       async function handleExampleClick(element, imageUrl, imageName) { /* ... (Keep implementation) ... */ if (currentExampleSelection) { currentExampleSelection.classList.remove('selected'); } element.classList.add('selected'); currentExampleSelection = element; if (imageUpload) imageUpload.value = null; displayFileName(`Example: ${imageName}`); resetResultState(); hideError(errorMessage); try { showPreview(imageUrl); showOcrLoading(true, "Fetching..."); const response = await fetch(imageUrl); if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); const blob = await response.blob(); const fileName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1)?.split('?')[0] || `${imageName.replace(/\s+/g, '_')}.png`; currentImageSource = new File([blob], fileName, { type: blob.type || 'image/png' }); enableProcessButtons(); } catch (error) { console.error("Error fetching example:", error); displayError(errorMessage, `Could not load example: ${error.message}`); disableProcessButtons(); currentImageSource = null; hidePreview(); } finally { showOcrLoading(false); } }
+       function handleFileSelect() { /* ... (Keep implementation) ... */ const file = imageUpload.files[0]; if (!file) return; const allowed = ['image/png', 'image/jpeg', 'image/jpg']; if (!allowed.includes(file.type)) { displayError(errorMessage, 'Invalid file type.'); clearOCRState(); return; } currentImageSource = file; displayFileName(file.name); resetResultState(); hideError(errorMessage); if (currentExampleSelection) { currentExampleSelection.classList.remove('selected'); currentExampleSelection = null; } showPreview(file); enableProcessButtons(); }
+       function displayFileName(name) { /* ... (Keep implementation) ... */ if (fileNameSpan) { fileNameSpan.textContent = name; fileNameSpan.classList.remove('italic', 'text-gray-500', 'dark:text-gray-400'); fileNameSpan.classList.add('font-medium'); } }
+       function resetFileName() { /* ... (Keep implementation) ... */ if (fileNameSpan) { const defaultEn = "No file chosen"; const defaultHi = "कोई फ़ाइल नहीं चुनी गई"; const currentLang = document.documentElement.lang || 'en'; fileNameSpan.textContent = currentLang === 'hi' ? defaultHi : defaultEn; fileNameSpan.classList.add('italic', 'text-gray-500', 'dark:text-gray-400'); fileNameSpan.classList.remove('font-medium'); } }
+       function showPreview(source) { /* ... (Keep implementation) ... */ if (!imagePreview || !imagePreviewContainer) return; imagePreview.src = ''; imagePreviewContainer.classList.remove('hidden'); if (typeof source === 'string') { imagePreview.src = source; } else if (source instanceof File) { const reader = new FileReader(); reader.onload = (e) => { imagePreview.src = e.target.result; }; reader.onerror = () => displayError(errorMessage, "Could not read file."); reader.readAsDataURL(source); } }
+       function hidePreview() { /* ... (Keep implementation) ... */ if (imagePreview && imagePreviewContainer) { imagePreview.src = '#'; imagePreviewContainer.classList.add('hidden'); } }
+       function enableProcessButtons() { /*... (Keep implementation) ... */ if (predictButton) predictButton.disabled = false; if (clearButton) clearButton.classList.remove('hidden'); }
+        function disableProcessButtons() { /* ... (Keep implementation) ... */ if (predictButton) predictButton.disabled = true; if (clearButton) clearButton.classList.add('hidden'); }
+
+        function resetResultState() { /* *** MODIFIED *** */
+            if (resultDisplay) resultDisplay.classList.add('hidden');
+            if (initialMessageOutput) initialMessageOutput.classList.remove('hidden');
+            // *** REMOVED lines for ocrRecognizedText and wordCountText ***
+            if (sakshiOutputText) sakshiOutputText.textContent = '';
+            if (wordDetectionImg) { wordDetectionImg.src = '#'; wordDetectionImg.style.display = 'none'; }
+            hideError(errorMessage);
+        }
+
+        function clearOCRState() { /* *** MODIFIED (only removed reference to predictionImg reset which was already removed) *** */
+             if (imageUpload) imageUpload.value = ''; currentImageSource = null; if (currentExampleSelection) { currentExampleSelection.classList.remove('selected'); currentExampleSelection = null; } hidePreview(); resetFileName(); disableProcessButtons(); resetResultState(); hideError(errorMessage); showOcrLoading(false); console.log("OCR State Cleared");
+        }
+
+        if (imageUpload) imageUpload.addEventListener('change', handleFileSelect);
+        if (predictButton) predictButton.addEventListener('click', processImage);
+        if (clearButton) clearButton.addEventListener('click', clearOCRState);
+
+        async function processImage() { /* *** MODIFIED *** */
+            if (!currentImageSource) { displayError(errorMessage, 'Please choose/select an image.'); return; } hideError(errorMessage); resetResultState(); showOcrLoading(true, "Preparing...");
+            try {
+                const formData = new FormData(); if (currentImageSource instanceof File) { formData.append('file', currentImageSource); } else if (typeof currentImageSource === 'string') { showOcrLoading(true, "Fetching sample..."); const response = await fetch(currentImageSource); if (!response.ok) throw new Error(`Fetch failed: ${response.statusText}`); const blob = await response.blob(); const filename = currentImageSource.split('/').pop()?.split('?')[0] || 'sample.png'; formData.append('file', new File([blob], filename, { type: blob.type || 'image/png' })); } else { throw new Error("Invalid image source."); }
+                showOcrLoading(true, "Processing OCR...");
+                const data = await authenticatedFetch(PROCESS_ENDPOINT, { method: 'POST', body: formData });
+                console.log("OCR Response:", data);
+
+                // *** REMOVED lines for ocrRecognizedText and wordCountText ***
+
+                // *** KEPT these lines ***
+                if(sakshiOutputText) sakshiOutputText.textContent = data.sakshi_output || 'No raw output.';
+                if(textToTranslateInput) textToTranslateInput.value = ''; // Clear the translation input initially.
+
+                // *** Only fetch Word Detection Image ***
+                const fetchWordDetectImage = async () => {
+                    wordDetectionImg.style.display = 'none';
+                    wordDetectionImg.src = '#';
+                    try {
+                        showOcrLoading(true, `Fetching Word Detection...`);
+                        const blob = await authenticatedFetch(WORD_DETECT_ENDPOINT);
+                        if (blob instanceof Blob) {
+                            const imageUrl = URL.createObjectURL(blob);
+                            wordDetectionImg.onload = () => URL.revokeObjectURL(imageUrl);
+                            wordDetectionImg.onerror = () => console.error(`Failed to load Word Detection from blob URL`);
+                            wordDetectionImg.src = imageUrl;
+                            wordDetectionImg.alt = "Word Detection Preview";
+                            wordDetectionImg.style.display = 'block';
+                        } else {
+                            console.warn(`Failed blob fetch for Word Detection`);
+                        }
+                    } catch (imgError) {
+                        console.error(`Error fetching Word Detection image:`, imgError);
+                    }
+                };
+
+                await fetchWordDetectImage(); // Await only the word detection image
+
+                if(resultDisplay) resultDisplay.classList.remove('hidden');
+                if(initialMessageOutput) initialMessageOutput.classList.add('hidden');
+            } catch (error) {
+                console.error('Error processing image:', error);
+                displayError(errorMessage, `Processing Error: ${error.message}`);
+                resetResultState(); // Ensure results are cleared on error
+            } finally {
+                showOcrLoading(false);
+            }
+        }
+
+        // --- TRANSLATION Functionality (Updated for Gemini Backend) ---
+        function clearTranslationState() {
+             if(textToTranslateInput) textToTranslateInput.value = '';
+             if(sourceLanguageInput) sourceLanguageInput.value = '';
+             if(targetLanguageInput) targetLanguageInput.value = '';
+             if(translationResultDisplay) translationResultDisplay.classList.add('hidden');
+             if(initialMessageTranslation) initialMessageTranslation.classList.remove('hidden');
+             // No 'detectedSourceLanguage' element to clear anymore
+             if(translationTargetLanguage) translationTargetLanguage.textContent = '';
+             if(translatedText) translatedText.innerHTML = ''; // Clear innerHTML
+             hideError(translationError);
+             showLoadingIndicator(translationLoading, false);
+             console.log("Translation Cleared");
+             // Ensure source language row is hidden on clear
+             const sourceLangItem = document.getElementById('detectedSourceLanguage')?.closest('.result-item');
+             if (sourceLangItem) {
+                 sourceLangItem.style.display = 'none';
+             }
+        }
+
+        if(translateButton) {
+            translateButton.addEventListener('click', async () => {
+                 const text = textToTranslateInput.value.trim();
+                 const sourceLang = sourceLanguageInput.value.trim();
+                 const targetLang = targetLanguageInput.value.trim();
+
+                 hideError(translationError);
+                 showLoadingIndicator(translationLoading, true);
+                 if(translationResultDisplay) translationResultDisplay.classList.add('hidden');
+                 if(initialMessageTranslation) initialMessageTranslation.classList.remove('hidden'); // Show initial message while loading/error
+
+                 if (!text) {
+                     displayError(translationError, 'Please enter text to translate.');
+                     showLoadingIndicator(translationLoading, false);
+                     return;
+                 }
+                 if (!targetLang) {
+                     displayError(translationError, 'Please enter the target language (e.g., English, Hindi).');
+                     showLoadingIndicator(translationLoading, false);
+                     return;
+                 }
+
+                 console.log(`Attempting translation from '${sourceLang || 'auto-detect'}' to '${targetLang}'. Text:`, text.substring(0, 50) + "...");
+
+                 const payload = {
+                     text: text,
+                     target_language: targetLang
+                 };
+                 // Only include source_language if the user provided it
+                 if (sourceLang) {
+                     payload.source_language = sourceLang;
+                 }
+                 console.log("Translation API Request Payload:", payload);
+
+                 try {
+                     // Use standard fetch, NOT authenticatedFetch, as this endpoint doesn't require the OCR token
+                     const response = await fetch(TRANSLATE_ENDPOINT, {
+                         method: 'POST',
+                         headers: {
+                             'Content-Type': 'application/json',
+                             'Accept': 'text/html' // Indicate preference for HTML response
+                         },
+                         body: JSON.stringify(payload)
+                     });
+
+                     // Check if the request was successful (status code 2xx)
+                     if (!response.ok) {
+                         let errorDetail = `Request failed with status: ${response.status}`;
+                         try {
+                             // Try to parse FastAPI's JSON error response
+                             const errorJson = await response.json();
+                             errorDetail = errorJson.detail || JSON.stringify(errorJson);
+                         } catch (e) {
+                              // If parsing JSON fails, try to get plain text error
+                              try {
+                                  errorDetail = await response.text();
+                              } catch (textErr) {
+                                  // Keep the original status code message if text fails too
+                              }
+                         }
+                         // Throw an error with the extracted detail
+                         throw new Error(errorDetail);
+                     }
+
+                     // Get the response body as HTML text
+                     const translatedHtml = await response.text();
+                     console.log("Translation API Raw HTML Response:", translatedHtml);
+
+                     // --- Update UI ---
+                     // Display the target language requested by the user
+                     if(translationTargetLanguage) translationTargetLanguage.textContent = targetLang;
+                     // Set the innerHTML of the result element to render the HTML tags
+                     if(translatedText) translatedText.innerHTML = translatedHtml;
+
+                     // Remove the section displaying detected source language as it's not returned
+                     const sourceLangItem = document.getElementById('detectedSourceLanguage')?.closest('.result-item');
+                     if (sourceLangItem) {
+                         sourceLangItem.style.display = 'none'; // Hide the source language display row
+                     }
+
+
+                     if(translationResultDisplay) translationResultDisplay.classList.remove('hidden');
+                     if(initialMessageTranslation) initialMessageTranslation.classList.add('hidden'); // Hide initial message on success
+
+                 } catch (error) {
+                     console.error('Error during translation fetch/processing:', error);
+                     let userMessage = `Translation Error: ${error.message}`; // Default message
+
+                     // Provide more specific feedback if possible
+                     if (error.message.includes("supported")) {
+                        userMessage = `Translation Error: The target language '${targetLang}' might not be supported by the backend.`;
+                     } else if (error.message.includes("Failed to fetch")) {
+                         userMessage = "Translation Error: Network error or CORS issue. Could not reach the translation server. Check console logs.";
+                     } else if (error.message.startsWith("Request failed with status:")) {
+                          userMessage = `Translation Error: Server responded with an error (${error.message})`; // Show status code error
+                     }
+
+                     displayError(translationError, userMessage);
+                     if(initialMessageTranslation) initialMessageTranslation.classList.remove('hidden'); // Ensure initial message placeholder is visible on error
+                 } finally {
+                     showLoadingIndicator(translationLoading, false);
+                 }
+            });
+        }
+
+        // --- GENDER PREDICTION Functionality ---
+        function clearGenderState() { /* ... (Keep implementation) ... */ if(namesInput) namesInput.value = ''; if(genderResultDisplay) genderResultDisplay.innerHTML = ''; if(genderResultDisplay) genderResultDisplay.classList.add('hidden'); if(initialMessageGender) initialMessageGender.classList.remove('hidden'); hideError(genderError); showLoadingIndicator(genderLoading, false); console.log("Gender Cleared"); }
+        function displayGenderResults(data) { /* ... (Keep implementation) ... */ if (!genderResultDisplay) return; genderResultDisplay.innerHTML = ''; if (!data || !data.predictions || data.predictions.length === 0) { genderResultDisplay.innerHTML = "<p class='text-center text-gray-500 dark:text-gray-400'>No prediction results.</p>"; return; } let resultsHTML = ''; data.predictions.forEach(p => { const maleProb = (p.male_probability !== null && p.male_probability !== undefined) ? p.male_probability.toFixed(2) : 'N/A'; const confidence = (p.confidence !== null && p.confidence !== undefined) ? p.confidence.toFixed(2) : 'N/A'; resultsHTML += `<div class="result-item"><div class="result-label">Name:</div><div class="result-value">${p.name || 'N/A'}</div><div class="result-label">Predicted:</div><div class="result-value">${p.predicted_gender || 'N/A'}</div><div class="result-label">Male Prob:</div><div class="result-value">${maleProb}</div><div class="result-label">Confidence:</div><div class="result-value">${confidence}</div></div>`; }); genderResultDisplay.innerHTML = resultsHTML; genderResultDisplay.classList.remove('hidden'); if(initialMessageGender) initialMessageGender.classList.add('hidden'); }
+        if(predictGenderButton) {
+            predictGenderButton.addEventListener('click', async () => { /* ... (Keep implementation) ... */
+                const namesString = namesInput.value.trim(); const names = namesString.split(',').map(name => name.trim()).filter(Boolean); hideError(genderError); showLoadingIndicator(genderLoading, true); if(genderResultDisplay) genderResultDisplay.classList.add('hidden'); if(initialMessageGender) initialMessageGender.classList.remove('hidden'); if (names.length === 0) { displayError(genderError, "Please enter names."); showLoadingIndicator(genderLoading, false); return; }
+                try { const data = await authenticatedFetch(GENDER_PREDICT_ENDPOINT, { method: 'POST', body: JSON.stringify({ names: names, threshold: 0.5 }) }); console.log("Gender Response:", data); displayGenderResults(data); } catch (error) { console.error("Gender Prediction error:", error); displayError(genderError, `Prediction Error: ${error.message}`); } finally { showLoadingIndicator(genderLoading, false); }
+            });
+         }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM Loaded. Initializing...");
+            accessToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+            if (accessToken) { showAppScreen(); } else { showAuthScreen(); }
+            resetFileName(); applyLanguage(savedLang);
+            clearOCRState(); clearTranslationState(); clearGenderState();
+            activateTab('ocr'); // Ensure OCR tab is active first
+             // Ensure source language row is hidden initially
+             const sourceLangItem = document.getElementById('detectedSourceLanguage')?.closest('.result-item');
+             if (sourceLangItem) {
+                 sourceLangItem.style.display = 'none';
+             }
+        });
+
+    </script>
+
+</body>
+</html>
